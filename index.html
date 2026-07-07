@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Field Notes: An Introduction to Biology, Chemistry, and Biotechnology</title>
+<style>
+  body {
+    font-family: "Times New Roman", Times, serif;
+    background: #ffffff;
+    color: #000000;
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+  }
+  #wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 10px 20px 40px;
+  }
+  h1 {
+    font-size: 26px;
+    margin-bottom: 2px;
+  }
+  .subtitle {
+    font-style: italic;
+    color: #333333;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid #999999;
+    margin: 10px 0 20px;
+  }
+  a {
+    color: #0000EE;
+  }
+  a:visited {
+    color: #551A8B;
+  }
+  table {
+    border-collapse: collapse;
+  }
+
+  /* top bar with search on the right */
+  #topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  #searchbox {
+    border: 1px solid #999999;
+    background: #f2f2f2;
+    padding: 8px;
+    font-size: 13px;
+  }
+  #searchbox label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 4px;
+  }
+  #searchInput {
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 13px;
+    padding: 3px;
+    width: 200px;
+  }
+  #searchSubmit {
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 13px;
+    padding: 3px 8px;
+  }
+  #resultCount {
+    font-size: 11px;
+    color: #555555;
+    margin-top: 4px;
+  }
+
+  /* table of contents */
+  #toc {
+    background: #f2f2f2;
+    border: 1px solid #999999;
+    padding: 10px 15px;
+    margin: 15px 0 25px;
+    font-size: 14px;
+  }
+  #toc h2 {
+    font-size: 16px;
+    margin-top: 0;
+  }
+  #toc ul {
+    columns: 2;
+    -webkit-columns: 2;
+    margin: 0;
+    padding-left: 20px;
+  }
+  #toc ul ul {
+    columns: 1;
+    padding-left: 18px;
+    margin: 2px 0 8px;
+  }
+  #toc li {
+    font-size: 13px;
+    margin-bottom: 2px;
+  }
+  #toc .toc-cat {
+    font-weight: bold;
+  }
+
+  /* section headings */
+  .category-heading {
+    background: #dddddd;
+    border: 1px solid #999999;
+    padding: 4px 8px;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 30px;
+  }
+
+  /* entries, table based like old course pages */
+  table.entry {
+    width: 100%;
+    border: 1px solid #999999;
+    margin: 12px 0;
+  }
+  table.entry td {
+    padding: 8px 10px;
+    vertical-align: top;
+    border-bottom: 1px solid #cccccc;
+  }
+  table.entry td.entry-id {
+    width: 90px;
+    font-family: "Courier New", monospace;
+    font-size: 12px;
+    color: #555555;
+    background: #f7f7f7;
+    border-right: 1px solid #cccccc;
+  }
+  table.entry h3 {
+    margin: 0 0 6px;
+    font-size: 16px;
+  }
+  table.entry p {
+    margin: 0 0 8px;
+  }
+  .interactive-note {
+    border: 1px dashed #999999;
+    background: #fafafa;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-family: Verdana, Arial, sans-serif;
+    color: #555555;
+    margin-bottom: 8px;
+  }
+  .see-also {
+    font-size: 13px;
+  }
+  .see-also b {
+    font-size: 13px;
+  }
+
+  .entry[hidden] { display: none; }
+  .category-block[data-empty="true"] { display: none; }
+
+  #emptyState {
+    display: none;
+    font-size: 14px;
+    color: #555555;
+    padding: 20px 0;
+  }
+  #emptyState.show { display: block; }
+
+  /* ask the lab AI, styled as a plain form */
+  #aiSection {
+    border: 1px solid #999999;
+    background: #f7f7f7;
+    padding: 10px 15px;
+    margin-top: 10px;
+    font-size: 13px;
+    display: none;
+  }
+  #aiSection.open { display: block; }
+  #aiSection textarea {
+    width: 100%;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 13px;
+    padding: 4px;
+  }
+  #aiAnswer {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #999999;
+    white-space: pre-wrap;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 13px;
+  }
+
+  #toggleAiLink {
+    font-size: 12px;
+  }
+
+  footer {
+    margin-top: 40px;
+    border-top: 1px solid #999999;
+    padding-top: 10px;
+    font-size: 12px;
+    color: #555555;
+  }
+</style>
+</head>
+<body>
+<div id="wrapper">
+
+  <div id="topbar">
+    <div>
+      <h1>Field Notes</h1>
+      <p class="subtitle">A plain-language, hands-on introduction to biology, chemistry, and biotechnology</p>
+    </div>
+    <div id="searchbox">
+      <label for="searchInput">Search this page:</label>
+      <input type="text" id="searchInput" placeholder="e.g. pH, CRISPR, cell">
+      <button id="searchSubmit" type="button">Go</button>
+      <div id="resultCount">18 entries listed below</div>
+      <div><a href="#" id="toggleAiLink">Can't find it? Ask the Lab AI &raquo;</a></div>
+    </div>
+  </div>
+  <hr>
+
+  <div id="aiSection">
+    <b>Ask the Lab AI</b><br>
+    <p style="margin:4px 0;">Type a question about any biology, chemistry, or biotechnology topic not listed below.</p>
+    <textarea id="aiQuestion" rows="3" placeholder="e.g. Why does yeast make bread rise?"></textarea><br>
+    <button id="aiSubmit" type="button">Ask</button>
+    <div id="aiAnswer"></div>
+  </div>
+
+  <div id="toc">
+    <h2>Table of Contents</h2>
+    <ul id="tocList"></ul>
+  </div>
+
+  <div id="catalog"></div>
+
+  <div id="emptyState">No entries match that search. Try the "Ask the Lab AI" box above.</div>
+
+  <footer>
+    Field Notes is a work in progress. An interactive exercise is planned for each entry; the dashed boxes mark where those will appear.
+  </footer>
+
+</div>
+
+<script>
+var TOPICS = [
+  { id:"BIO-01", cat:"biology", title:"Cell Structure and Organelles",
+    blurb:"Every living thing is built from cells, and every cell is a tiny factory with departments: a nucleus that holds instructions, mitochondria that make energy, and membranes that decide what gets in or out.",
+    tags:["cells","organelles","nucleus","mitochondria"],
+    links:[{label:"Khan Academy: Structure of a cell", url:"https://www.khanacademy.org/science/biology/structure-of-a-cell"},{label:"NIH: NCBI", url:"https://www.ncbi.nlm.nih.gov/"}] },
+  { id:"BIO-02", cat:"biology", title:"DNA and the Genetic Code",
+    blurb:"DNA is a molecule that spells out instructions using just four letters, repeated in different orders. Those instructions get read and translated into everything your body builds.",
+    tags:["DNA","genetics","code","RNA"],
+    links:[{label:"Nature Scitable", url:"https://www.nature.com/scitable"},{label:"NHGRI: Genetics 101", url:"https://www.genome.gov/"}] },
+  { id:"BIO-03", cat:"biology", title:"Photosynthesis and Cellular Respiration",
+    blurb:"Plants capture sunlight and turn it into sugar; almost everything else, including you, breaks that sugar back down for energy. It is the same process running in two directions.",
+    tags:["photosynthesis","respiration","energy","plants"],
+    links:[{label:"Khan Academy: Photosynthesis", url:"https://www.khanacademy.org/science/biology/photosynthesis-in-plants"}] },
+  { id:"BIO-04", cat:"biology", title:"Evolution and Natural Selection",
+    blurb:"Traits that help an organism survive and reproduce tend to stick around in a population. Given enough time, small advantages compound into entirely new species.",
+    tags:["evolution","natural selection","species","genetics"],
+    links:[{label:"UC Berkeley: Understanding Evolution", url:"https://evolution.berkeley.edu/"}] },
+  { id:"BIO-05", cat:"biology", title:"The Immune System",
+    blurb:"Your body runs a constant patrol for anything that does not belong, from a splinter to a virus. It remembers past invaders, which is the entire idea behind vaccines.",
+    tags:["immune system","antibodies","vaccines","infection"],
+    links:[{label:"NIH: NIAID", url:"https://www.niaid.nih.gov/"}] },
+  { id:"BIO-06", cat:"biology", title:"Ecosystems and Food Webs",
+    blurb:"No organism survives alone. Energy and nutrients move through a web of eating and being eaten, and removing one strand can reshape the whole system.",
+    tags:["ecosystems","food webs","energy flow","ecology"],
+    links:[{label:"National Geographic: Ecosystems", url:"https://www.nationalgeographic.org/topics/resource-library-ecosystems/"}] },
+
+  { id:"CHEM-01", cat:"chemistry", title:"Atomic Structure",
+    blurb:"Atoms are mostly empty space: a dense nucleus of protons and neutrons, orbited by electrons whose arrangement decides how that atom behaves with everything around it.",
+    tags:["atoms","protons","electrons","structure"],
+    links:[{label:"Khan Academy: Atomic structure", url:"https://www.khanacademy.org/science/chemistry/atomic-structure-and-properties"}] },
+  { id:"CHEM-02", cat:"chemistry", title:"The Periodic Table and Trends",
+    blurb:"The periodic table is not just a chart to memorize. Its layout predicts how an element will behave before you ever run an experiment.",
+    tags:["periodic table","elements","trends"],
+    links:[{label:"Royal Society of Chemistry", url:"https://www.rsc.org/periodic-table"}] },
+  { id:"CHEM-03", cat:"chemistry", title:"Chemical Bonding",
+    blurb:"Atoms bond by sharing or trading electrons to become more stable. Which strategy they use decides whether you get water, salt, or a diamond.",
+    tags:["bonding","ionic","covalent","molecules"],
+    links:[{label:"Khan Academy: Chemical bonds", url:"https://www.khanacademy.org/science/chemistry/chemical-bonds"}] },
+  { id:"CHEM-04", cat:"chemistry", title:"Acids, Bases, and pH",
+    blurb:"The pH scale measures how many free hydrogen ions are floating in a solution, and that single number explains everything from stomach acid to why soap feels slippery.",
+    tags:["acids","bases","pH","solutions"],
+    links:[{label:"USGS: The pH scale", url:"https://www.usgs.gov/special-topics/water-science-school/science/ph-and-water"}] },
+  { id:"CHEM-05", cat:"chemistry", title:"Reaction Rates and Equilibrium",
+    blurb:"Some reactions finish in a flash, others take years. Temperature, concentration, and catalysts all change the speed, and many reactions never fully finish at all, settling into balance instead.",
+    tags:["kinetics","equilibrium","catalysts","reaction rate"],
+    links:[{label:"Khan Academy: Chemical equilibrium", url:"https://www.khanacademy.org/science/chemistry/chem-equilibrium"}] },
+  { id:"CHEM-06", cat:"chemistry", title:"States of Matter and Phase Changes",
+    blurb:"Solid, liquid, gas: the same molecules, just moving at different speeds. Add or remove enough energy and matter flips from one state to another.",
+    tags:["states of matter","phase change","energy"],
+    links:[{label:"Khan Academy: States of matter", url:"https://www.khanacademy.org/science/physics/states-of-matter-and-intermolecular-forces"}] },
+
+  { id:"BT-01", cat:"biotech", title:"CRISPR Gene Editing",
+    blurb:"CRISPR lets scientists cut DNA at a precise spot and edit it, borrowed from a defense system bacteria already use against viruses.",
+    tags:["CRISPR","gene editing","genome"],
+    links:[{label:"Broad Institute: What is CRISPR?", url:"https://www.broadinstitute.org/what-crispr"}] },
+  { id:"BT-02", cat:"biotech", title:"PCR and DNA Amplification",
+    blurb:"PCR takes a single trace of DNA, from a crime scene, a swab, a fossil, and copies it millions of times until there is enough to study.",
+    tags:["PCR","DNA amplification","lab technique"],
+    links:[{label:"NIH: PCR explained", url:"https://www.genome.gov/genetics-glossary/Polymerase-Chain-Reaction"}] },
+  { id:"BT-03", cat:"biotech", title:"Cloning and Stem Cells",
+    blurb:"Stem cells have not decided what kind of cell to become yet, which makes them a starting point for regrowing tissue or, controversially, copying an entire organism.",
+    tags:["cloning","stem cells","regeneration"],
+    links:[{label:"NIH: Stem Cell Basics", url:"https://stemcells.nih.gov/"}] },
+  { id:"BT-04", cat:"biotech", title:"Vaccines and Immunotherapy",
+    blurb:"Vaccines show your immune system a harmless preview of a threat so it is ready for the real thing. The same trick is now being turned against cancer cells.",
+    tags:["vaccines","immunotherapy","mRNA"],
+    links:[{label:"CDC: How vaccines work", url:"https://www.cdc.gov/vaccines/"}] },
+  { id:"BT-05", cat:"biotech", title:"Genetically Modified Organisms",
+    blurb:"GMOs have had a gene added or changed on purpose, often to resist pests or drought, which is the same editing toolbox as CRISPR, just aimed at food.",
+    tags:["GMO","agriculture","genetic modification"],
+    links:[{label:"FDA: Agricultural Biotechnology", url:"https://www.fda.gov/food/agricultural-biotechnology"}] },
+  { id:"BT-06", cat:"biotech", title:"Bioinformatics and Genome Sequencing",
+    blurb:"Reading an entire genome produces billions of letters of data. Bioinformatics is the computing side of biology that makes sense of it all.",
+    tags:["bioinformatics","sequencing","genomics","data"],
+    links:[{label:"EBI: Bioinformatics introduction", url:"https://www.ebi.ac.uk/training/online/courses"}] }
+];
+
+var CATS = [
+  { key:"biology", label:"I. Biology" },
+  { key:"chemistry", label:"II. Chemistry" },
+  { key:"biotech", label:"III. Biotechnology" }
+];
+
+function escAttr(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+}
+
+function buildToc() {
+  var html = "";
+  for (var i = 0; i < CATS.length; i++) {
+    var cat = CATS[i];
+    var items = TOPICS.filter(function (t) { return t.cat === cat.key; });
+    html += '<li class="toc-cat"><a href="#cat-' + cat.key + '">' + cat.label + "</a><ul>";
+    for (var j = 0; j < items.length; j++) {
+      html += '<li><a href="#' + items[j].id + '">' + items[j].title + "</a></li>";
+    }
+    html += "</ul></li>";
+  }
+  document.getElementById("tocList").innerHTML = html;
+}
+
+function entryRow(t) {
+  var linksHtml = "";
+  for (var i = 0; i < t.links.length; i++) {
+    linksHtml += '<a href="' + t.links[i].url + '" target="_blank" rel="noopener">' + t.links[i].label + "</a>";
+    if (i < t.links.length - 1) linksHtml += " &nbsp;|&nbsp; ";
+  }
+  var titleAttr = escAttr(t.title.toLowerCase());
+  var blurbAttr = escAttr(t.blurb.toLowerCase());
+  var tagsAttr = escAttr(t.tags.join(" ").toLowerCase());
+
+  return (
+    '<table class="entry" id="' + t.id + '" data-title="' + titleAttr + '" data-blurb="' + blurbAttr + '" data-tags="' + tagsAttr + '">' +
+      "<tr>" +
+        '<td class="entry-id">' + t.id + "</td>" +
+        "<td>" +
+          "<h3>" + t.title + "</h3>" +
+          "<p>" + t.blurb + "</p>" +
+          '<div class="interactive-note">[ interactive exercise for this topic is planned but not yet built ]</div>' +
+          '<div class="see-also"><b>See also:</b> ' + linksHtml + "</div>" +
+        "</td>" +
+      "</tr>" +
+    "</table>"
+  );
+}
+
+function buildCatalog() {
+  var html = "";
+  for (var i = 0; i < CATS.length; i++) {
+    var cat = CATS[i];
+    var items = TOPICS.filter(function (t) { return t.cat === cat.key; });
+    html += '<div class="category-block" id="cat-' + cat.key + '" data-cat="' + cat.key + '">';
+    html += '<div class="category-heading">' + cat.label + "</div>";
+    for (var j = 0; j < items.length; j++) {
+      html += entryRow(items[j]);
+    }
+    html += "</div>";
+  }
+  document.getElementById("catalog").innerHTML = html;
+}
+
+buildToc();
+buildCatalog();
+
+var searchInput = document.getElementById("searchInput");
+var searchSubmit = document.getElementById("searchSubmit");
+var resultCount = document.getElementById("resultCount");
+var emptyState = document.getElementById("emptyState");
+var aiSection = document.getElementById("aiSection");
+
+function runSearch() {
+  var q = searchInput.value.trim().toLowerCase();
+  var visibleTotal = 0;
+  var blocks = document.querySelectorAll(".category-block");
+
+  for (var i = 0; i < blocks.length; i++) {
+    var block = blocks[i];
+    var entries = block.querySelectorAll(".entry");
+    var visibleInBlock = 0;
+    for (var j = 0; j < entries.length; j++) {
+      var entry = entries[j];
+      var hay = entry.getAttribute("data-title") + " " + entry.getAttribute("data-blurb") + " " + entry.getAttribute("data-tags");
+      var match = q === "" || hay.indexOf(q) !== -1;
+      entry.hidden = !match;
+      if (match) visibleInBlock++;
+    }
+    block.setAttribute("data-empty", visibleInBlock === 0 ? "true" : "false");
+    visibleTotal += visibleInBlock;
+  }
+
+  resultCount.textContent = q === "" ? (TOPICS.length + " entries listed below") : (visibleTotal + " match" + (visibleTotal === 1 ? "" : "es") + ' for "' + searchInput.value + '"');
+  emptyState.className = visibleTotal === 0 ? "show" : "";
+  if (visibleTotal === 0) aiSection.className = "open";
+}
+
+searchInput.addEventListener("keyup", function (e) {
+  if (e.key === "Enter") runSearch();
+});
+searchSubmit.addEventListener("click", runSearch);
+
+var toggleAiLink = document.getElementById("toggleAiLink");
+toggleAiLink.addEventListener("click", function (e) {
+  e.preventDefault();
+  aiSection.className = aiSection.className === "open" ? "" : "open";
+});
+
+var aiSubmit = document.getElementById("aiSubmit");
+var aiQuestion = document.getElementById("aiQuestion");
+var aiAnswer = document.getElementById("aiAnswer");
+
+aiSubmit.addEventListener("click", function () {
+  var question = aiQuestion.value.trim();
+  if (!question) return;
+  aiSubmit.disabled = true;
+  aiAnswer.textContent = "Thinking...";
+  fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-6",
+      max_tokens: 1000,
+      messages: [
+        { role: "user", content: "You are the Lab AI fallback on a biology/chemistry/biotechnology learning page called Field Notes. Explain the following in plain, friendly language for a beginner, in 3-5 short sentences: " + question }
+      ]
+    })
+  })
+    .then(function (response) { return response.json(); })
+    .then(function (data) {
+      var blocksArr = data.content || [];
+      var text = blocksArr.filter(function (b) { return b.type === "text"; }).map(function (b) { return b.text; }).join("\n");
+      aiAnswer.textContent = text || "Sorry, no answer came back for that.";
+    })
+    .catch(function () {
+      aiAnswer.textContent = "Something went wrong reaching the Lab AI. Please try again.";
+    })
+    .finally(function () {
+      aiSubmit.disabled = false;
+    });
+});
+</script>
+</body>
+</html>

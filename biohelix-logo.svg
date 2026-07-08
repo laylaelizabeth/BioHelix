@@ -1,0 +1,16 @@
+<svg viewBox="0 0 520 160" xmlns="http://www.w3.org/2000/svg">
+  <text x="10" y="80" font-family="Georgia, 'Times New Roman', Times, serif" font-weight="700" font-size="64" fill="#000000">BioHelix</text>
+
+  <!-- helix runs beneath the wordmark as a horizontal double strand, like a lab report underline -->
+  <g fill="none" stroke="#000000" stroke-width="4" stroke-linecap="round">
+    <path d="M10,102 C36.7,102 36.7,116 63.3,116 C90,116 90,102 116.7,102 C143.3,102 143.3,116 170,116 C196.7,116 196.7,102 223.3,102 C250,102 250,116 276.7,116 C303.3,116 303.3,102 330,102 C356.7,102 356.7,116 383,116 C409.7,116 409.7,102 436.3,102 C463,102 463,116 490,116"/>
+    <path d="M10,116 C36.7,116 36.7,102 63.3,102 C90,102 90,116 116.7,116 C143.3,116 143.3,102 170,102 C196.7,102 196.7,116 223.3,116 C250,116 250,102 276.7,102 C303.3,102 303.3,116 330,116 C356.7,116 356.7,102 383,102 C409.7,102 409.7,116 436.3,116 C463,116 463,102 490,102"/>
+  </g>
+  <g fill="#000000">
+    <rect x="53.3" y="106" width="20" height="6" rx="1"/>
+    <rect x="160" y="106" width="20" height="6" rx="1"/>
+    <rect x="266.7" y="106" width="20" height="6" rx="1"/>
+    <rect x="373" y="106" width="20" height="6" rx="1"/>
+    <rect x="480" y="106" width="10" height="6" rx="1"/>
+  </g>
+</svg>

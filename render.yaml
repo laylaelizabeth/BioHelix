@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: biohelix-lab-api
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python server.py
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: ANTHROPIC_API_KEY
+        sync: false

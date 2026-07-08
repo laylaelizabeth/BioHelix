@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 import requests
 from dotenv import load_dotenv
@@ -11,7 +11,7 @@ CORS(app)
 
 @app.route('/')
 def serve_index():
-    return app.send_static_file('index.html')
+    return send_file('index.html')
 
 @app.route('/api/ask', methods=['POST'])
 def ask_lab_ai():

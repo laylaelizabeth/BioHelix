@@ -448,7 +448,7 @@ aiSubmit.addEventListener("click", function () {
   if (!question) return;
   aiSubmit.disabled = true;
   aiAnswer.textContent = "Thinking...";
-  fetch("/api/ask", {
+  fetch("https://biohelix-lab-api.onrender.com/api/ask", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ question: question })

@@ -59,5 +59,5 @@ def ask_lab_ai():
         return jsonify({'error': 'Something went wrong. Please try again.'}), 500
 
 if __name__ == '__main__':
-    port = os.getenv('PORT', 3000)
-    app.run(debug=False, port=int(port))
+    port = int(os.getenv('PORT', 8080))
+    app.run(debug=False, host='0.0.0.0', port=port)

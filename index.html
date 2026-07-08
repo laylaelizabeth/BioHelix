@@ -448,22 +448,18 @@ aiSubmit.addEventListener("click", function () {
   if (!question) return;
   aiSubmit.disabled = true;
   aiAnswer.textContent = "Thinking...";
-  fetch("https://api.anthropic.com/v1/messages", {
+  fetch("/api/ask", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-6",
-      max_tokens: 1000,
-      messages: [
-        { role: "user", content: "You are the Lab AI fallback on a biology/chemistry/biotechnology learning page called Field Notes. Explain the following in plain, friendly language for a beginner, in 3-5 short sentences: " + question }
-      ]
-    })
+    body: JSON.stringify({ question: question })
   })
     .then(function (response) { return response.json(); })
     .then(function (data) {
-      var blocksArr = data.content || [];
-      var text = blocksArr.filter(function (b) { return b.type === "text"; }).map(function (b) { return b.text; }).join("\n");
-      aiAnswer.textContent = text || "Sorry, no answer came back for that.";
+      if (data.error) {
+        aiAnswer.textContent = data.error;
+      } else {
+        aiAnswer.textContent = data.answer || "Sorry, no answer came back for that.";
+      }
     })
     .catch(function () {
       aiAnswer.textContent = "Something went wrong reaching the Lab AI. Please try again.";

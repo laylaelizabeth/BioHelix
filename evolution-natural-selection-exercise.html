@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BIO-04 :: Evolution and Natural Selection -- Interactive Exercise</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 20px;
+    background: #ffffff;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    color: #000000;
+  }
+  #exercise {
+    max-width: 640px;
+    margin: 0 auto;
+    border: 2px solid #000000;
+    padding: 16px 20px 20px;
+  }
+  .tag {
+    display: inline-block;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    background: #f0f0f0;
+    border: 1px solid #000000;
+    padding: 2px 8px;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 22px;
+    margin: 4px 0 4px;
+  }
+  .instructions {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    margin: 0 0 16px;
+    color: #333333;
+  }
+
+  #sequence {
+    border: 1px solid #000000;
+    background: #fafafa;
+    padding: 10px 12px;
+    margin-bottom: 18px;
+  }
+  .seq-slot {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    padding: 7px 4px;
+    font-size: 14px;
+    border-bottom: 1px dashed #cccccc;
+  }
+  .seq-slot:last-child { border-bottom: none; }
+  .seq-num {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    color: #000000;
+    min-width: 58px;
+  }
+  .seq-text {
+    color: #bbbbbb;
+    font-family: 'Courier New', Courier, monospace;
+  }
+  .seq-slot.solved .seq-text {
+    color: #0000ee;
+    font-family: Georgia, serif;
+    font-weight: bold;
+  }
+
+  #pool h3 {
+    font-size: 14px;
+    margin: 0 0 8px;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: normal;
+    border-bottom: 1px dashed #000000;
+    padding-bottom: 4px;
+  }
+  .card-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    margin-bottom: 8px;
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+    font-size: 13px;
+    background: #d4d0c8;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    padding: 9px 12px;
+    cursor: pointer;
+  }
+  .card-btn:active {
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+  }
+  .card-btn.used {
+    display: none;
+  }
+  .card-btn.wrong {
+    background: #ffd9d9;
+    border-color: #cc0000;
+    color: #660000;
+  }
+
+  #statusbar {
+    margin-top: 16px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    border-top: 1px solid #000000;
+    padding-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  #statusbar .readout::after {
+    content: '_';
+    animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  #controls button {
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+    font-size: 12px;
+    background: #d4d0c8;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    padding: 5px 12px;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+  #controls button:active {
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+  }
+
+  #modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    align-items: center;
+    justify-content: center;
+  }
+  #modal-overlay.show { display: flex; }
+  #modal-box {
+    background: #d4d0c8;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    width: 300px;
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+  }
+  #modal-title {
+    background: #0000ee;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 8px;
+  }
+  #modal-body {
+    padding: 16px;
+    font-size: 13px;
+    text-align: center;
+  }
+  #modal-body button {
+    margin-top: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div id="exercise">
+  <span class="tag">BIO-04 :: EXERCISE</span>
+  <h2>Evolution and Natural Selection</h2>
+  <p class="instructions">&gt; Click the statements below in the correct order to rebuild how natural selection works.</p>
+
+  <div id="sequence"></div>
+
+  <div id="pool">
+    <h3>&gt; STATEMENT POOL</h3>
+    <div id="cards"></div>
+  </div>
+
+  <div id="statusbar">
+    <div class="readout" id="readout">STEPS PLACED: 0/5&nbsp;&nbsp;&nbsp;MISTAKES: 0</div>
+    <div id="controls">
+      <button id="newRoundBtn">New Round</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-overlay">
+  <div id="modal-box">
+    <div id="modal-title">BIOHELIX.EXE</div>
+    <div id="modal-body">
+      <div>SEQUENCE COMPLETE.<br>POPULATION ADAPTED.</div>
+      <button id="modalOkBtn">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var STEPS = [
+    { key: 1, text: 'Individuals in a population vary in their traits.' },
+    { key: 2, text: 'More offspring are produced than the environment can support.' },
+    { key: 3, text: 'Individuals with helpful traits are more likely to survive and reproduce.' },
+    { key: 4, text: 'Those helpful traits get passed on to the next generation.' },
+    { key: 5, text: 'Over many generations, the population becomes better adapted to its environment.' }
+  ];
+
+  var sequenceEl = document.getElementById('sequence');
+  var cardsEl = document.getElementById('cards');
+  var readout = document.getElementById('readout');
+
+  var expectedIndex = 0;
+  var mistakes = 0;
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  function renderSequence() {
+    sequenceEl.innerHTML = '';
+    STEPS.forEach(function (s, i) {
+      var row = document.createElement('div');
+      row.className = 'seq-slot';
+      row.id = 'seqSlot' + i;
+      row.innerHTML = '<span class="seq-num">STEP ' + (i + 1) + ':</span><span class="seq-text">&mdash;&mdash;&mdash;&mdash;&mdash;</span>';
+      sequenceEl.appendChild(row);
+    });
+  }
+
+  function renderCards() {
+    cardsEl.innerHTML = '';
+    shuffle(STEPS).forEach(function (s) {
+      var btn = document.createElement('button');
+      btn.className = 'card-btn';
+      btn.type = 'button';
+      btn.textContent = s.text;
+      btn.dataset.key = s.key;
+      btn.addEventListener('click', function () { onCardClick(btn, s); });
+      cardsEl.appendChild(btn);
+    });
+  }
+
+  function updateReadout() {
+    readout.innerHTML = 'STEPS PLACED: ' + expectedIndex + '/' + STEPS.length + '&nbsp;&nbsp;&nbsp;MISTAKES: ' + mistakes;
+  }
+
+  function onCardClick(btn, step) {
+    if (btn.classList.contains('used')) return;
+    var expectedStep = STEPS[expectedIndex];
+    if (step.key === expectedStep.key) {
+      var row = document.getElementById('seqSlot' + expectedIndex);
+      row.classList.add('solved');
+      row.querySelector('.seq-text').textContent = step.text;
+      btn.classList.add('used');
+      expectedIndex += 1;
+      updateReadout();
+      if (expectedIndex === STEPS.length) {
+        document.getElementById('modal-overlay').classList.add('show');
+      }
+    } else {
+      mistakes += 1;
+      btn.classList.add('wrong');
+      setTimeout(function () { btn.classList.remove('wrong'); }, 500);
+      updateReadout();
+    }
+  }
+
+  document.getElementById('newRoundBtn').addEventListener('click', function () {
+    expectedIndex = 0;
+    mistakes = 0;
+    document.getElementById('modal-overlay').classList.remove('show');
+    renderSequence();
+    renderCards();
+    updateReadout();
+  });
+
+  document.getElementById('modalOkBtn').addEventListener('click', function () {
+    document.getElementById('modal-overlay').classList.remove('show');
+  });
+
+  renderSequence();
+  renderCards();
+  updateReadout();
+})();
+</script>
+
+</body>
+</html>

@@ -253,8 +253,8 @@
   var BAR_WIDTH = 500;
   var NEUTRAL_MIN_PH = 6.5;
   var NEUTRAL_MAX_PH = 7.5;
-  var INITIAL_DURATION_MS = 1900;
-  var MIN_DURATION_MS = 650;
+  var INITIAL_DURATION_MS = 2600;
+  var MIN_DURATION_MS = 900;
   var API_BASE = 'https://biohelix-production.up.railway.app';
   var GAME_KEY = 'acids-neutral-dive';
 
@@ -411,6 +411,12 @@
   }
 
   jumpBtn.addEventListener('click', onJump);
+  document.addEventListener('keydown', function (event) {
+    if (event.code === 'Space') {
+      event.preventDefault();
+      if (!jumpBtn.disabled) onJump();
+    }
+  });
   document.getElementById('restartBtn').addEventListener('click', restart);
   document.getElementById('modalOkBtn').addEventListener('click', restart);
 

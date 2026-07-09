@@ -255,21 +255,66 @@
     font-size: 12px;
     color: #555555;
   }
+  #miniGamesSidebar {
+    float: right;
+    width: 200px;
+    margin: 0 0 12px 16px;
+    border: 2px solid #000000;
+    padding: 12px 14px;
+    font-family: Georgia, "Times New Roman", Times, serif;
+    background: #ffffff;
+    box-sizing: border-box;
+  }
+  #miniGamesSidebar h3 {
+    font-size: 14px;
+    margin: 0 0 8px;
+    border-bottom: 1px dashed #000000;
+    padding-bottom: 5px;
+  }
+  #miniGamesSidebar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+  #miniGamesSidebar .coming-soon {
+    color: #666666;
+    margin-top: 4px;
+  }
+  #miniGamesSidebar .coming-soon span {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 11px;
+  }
+  @media (max-width: 700px) {
+    #miniGamesSidebar {
+      float: none;
+      width: 100%;
+      max-width: 100%;
+      margin: 8px 0 14px;
+      padding: 10px 12px;
+    }
+    #miniGamesSidebar h3 { font-size: 13px; }
+    #miniGamesSidebar ul {
+      font-size: 11px;
+      line-height: 1.6;
+    }
+  }
 </style>
 </head>
 <body>
 <div id="wrapper">
-  <aside style="float:right; width:230px; margin:0 0 16px 24px; border:2px solid #000000; padding:14px 18px; font-family: Georgia, 'Times New Roman', Times, serif; background:#ffffff;">
-    <h3 style="font-size:15px; margin:0 0 10px; border-bottom:1px dashed #000000; padding-bottom:6px;">Additional Mini Games</h3>
-    <ul style="list-style:none; margin:0; padding:0; font-size:13px; line-height:1.9;">
+  <aside id="miniGamesSidebar">
+    <h3>Additional Mini Games</h3>
+    <ul>
       <li><a href="cell-structure-exercise-v2.html">Cell Structure &amp; Organelles</a></li>
       <li><a href="dna-genetic-code-exercise.html">DNA and the Genetic Code</a></li>
       <li><a href="photosynthesis-cellular-respiration-exercise.html">Photosynthesis &amp; Respiration</a></li>
       <li><a href="evolution-natural-selection-exercise.html">Evolution &amp; Natural Selection</a></li>
       <li><a href="immune-system-exercise.html">The Immune System</a></li>
       <li><a href="ecosystems-food-webs-exercise.html">Ecosystems &amp; Food Webs</a></li>
-      <li style="color:#666666; margin-top:4px;">Protein Folding
-        <span style="font-family:'Courier New',Courier,monospace; font-size:11px;">(coming soon)</span>
+      <li class="coming-soon">Protein Folding
+        <span>(coming soon)</span>
       </li>
     </ul>
   </aside>

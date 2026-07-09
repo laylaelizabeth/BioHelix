@@ -203,6 +203,7 @@
       <rect x="20" y="105" width="460" height="40" rx="6" fill="#8fd3f4" stroke="#000000" stroke-width="2"/>
       <path id="ripple1" d="M40,115 Q55,110 70,115 T100,115 T130,115" fill="none" stroke="#3a8fc0" stroke-width="1.5"/>
       <path id="ripple2" d="M300,122 Q315,117 330,122 T360,122 T390,122" fill="none" stroke="#3a8fc0" stroke-width="1.5"/>
+      <g id="splashFX"></g>
 
       <rect x="18" y="60" width="70" height="8" fill="#8a5a2b" stroke="#000000" stroke-width="2"/>
       <rect x="18" y="68" width="8" height="37" fill="#8a5a2b" stroke="#000000" stroke-width="2"/>
@@ -253,10 +254,11 @@
   var BAR_WIDTH = 500;
   var NEUTRAL_MIN_PH = 6.5;
   var NEUTRAL_MAX_PH = 7.5;
-  var INITIAL_DURATION_MS = 2600;
-  var MIN_DURATION_MS = 900;
-  var API_BASE = 'https://biohelix-production.up.railway.app';
-  var GAME_KEY = 'acids-neutral-dive';
+  var INITIAL_DURATION_MS = 3400;
+  var MIN_DURATION_MS = 1200;
+  var DIVE_START = { x: 52, y: 50 };
+  var DIVE_END = { x: 180, y: 118 };
+  var DIVE_DURATION_MS = 600;
 
   var pointerEl = document.getElementById('pointer');
   var diverEl = document.getElementById('diver');
@@ -267,6 +269,48 @@
   var jumpBtn = document.getElementById('jumpBtn');
   var modalOverlay = document.getElementById('modal-overlay');
   var modalMsg = document.getElementById('modalMsg');
+  var splashFX = document.getElementById('splashFX');
+  var jumping = false;
+
+  function setDiverTransform(x, y, rotation) {
+    diverEl.setAttribute('transform', 'translate(' + x + ',' + y + ')' + (rotation ? ' rotate(' + rotation + ')' : ''));
+  }
+
+  function showSplash(x, y) {
+    splashFX.innerHTML = '';
+    var deltas = [[-14, -10], [14, -10], [-8, -20], [8, -20], [0, -24]];
+    deltas.forEach(function (d) {
+      var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      c.setAttribute('cx', x + d[0]);
+      c.setAttribute('cy', y + d[1]);
+      c.setAttribute('r', 3);
+      c.setAttribute('fill', '#ffffff');
+      c.setAttribute('stroke', '#3a8fc0');
+      c.setAttribute('stroke-width', '1');
+      splashFX.appendChild(c);
+    });
+    setTimeout(function () { splashFX.innerHTML = ''; }, 450);
+  }
+
+  function animateDiverJump(onDone) {
+    jumping = true;
+    var start = null;
+    function frame(now) {
+      if (start === null) start = now;
+      var progress = Math.min(1, (now - start) / DIVE_DURATION_MS);
+      var x = DIVE_START.x + (DIVE_END.x - DIVE_START.x) * progress;
+      var straightY = DIVE_START.y + (DIVE_END.y - DIVE_START.y) * progress;
+      var y = straightY - 45 * Math.sin(progress * Math.PI);
+      setDiverTransform(x, y, progress * 90);
+      if (progress < 1) {
+        requestAnimationFrame(frame);
+      } else {
+        jumping = false;
+        onDone();
+      }
+    }
+    requestAnimationFrame(frame);
+  }
 
   var t = 0;              // 0..1 fraction across the bar
   var direction = 1;
@@ -276,7 +320,6 @@
   var running = true;
   var jumps = 0;
   var bestStreak = 0;
-  var bestLoaded = false;
   var streak = 0;
 
   function currentPH() {
@@ -295,47 +338,6 @@
 
   function updateReadout() {
     readout.innerHTML = 'SUCCESSFUL JUMPS: ' + jumps + '&nbsp;&nbsp;&nbsp;BEST STREAK: ' + bestStreak;
-    if (!bestLoaded) {
-      readout.innerHTML += '&nbsp;&nbsp;&nbsp;(SYNCING...)';
-    }
-  }
-
-  function fetchBestScore() {
-    return fetch(API_BASE + '/api/highscore?game=' + encodeURIComponent(GAME_KEY))
-      .then(function (response) {
-        if (!response.ok) throw new Error('Could not load best score.');
-        return response.json();
-      })
-      .then(function (data) {
-        if (typeof data.best === 'number' && data.best > bestStreak) {
-          bestStreak = data.best;
-        }
-        bestLoaded = true;
-        updateReadout();
-      })
-      .catch(function () {
-        bestLoaded = true;
-        updateReadout();
-      });
-  }
-
-  function submitBestScore(score) {
-    return fetch(API_BASE + '/api/highscore', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ game: GAME_KEY, score: score })
-    })
-      .then(function (response) {
-        if (!response.ok) throw new Error('Could not save best score.');
-        return response.json();
-      })
-      .then(function (data) {
-        if (typeof data.best === 'number' && data.best !== bestStreak) {
-          bestStreak = data.best;
-          updateReadout();
-        }
-      })
-      .catch(function () {});
   }
 
   function step(now) {
@@ -368,20 +370,25 @@
   }
 
   function onJump() {
-    if (!running) return;
+    if (!running || jumping) return;
     var ph = currentPH();
     var zone = zoneFor(ph);
 
     if (zone === 'neutral') {
       jumps += 1;
       streak += 1;
-      if (streak > bestStreak) {
-        bestStreak = streak;
-        submitBestScore(streak);
-      }
+      if (streak > bestStreak) bestStreak = streak;
       updateReadout();
       showFeedback('NICE DIVE! pH ' + ph.toFixed(1) + ' -- PERFECTLY NEUTRAL.');
       durationMs = Math.max(MIN_DURATION_MS, durationMs * 0.9);
+      jumpBtn.disabled = true;
+      animateDiverJump(function () {
+        showSplash(DIVE_END.x, DIVE_END.y);
+        setTimeout(function () {
+          setDiverTransform(DIVE_START.x, DIVE_START.y, 0);
+          jumpBtn.disabled = false;
+        }, 400);
+      });
     } else {
       streak = 0;
       stopLoop();
@@ -400,9 +407,13 @@
     durationMs = INITIAL_DURATION_MS;
     jumps = 0;
     streak = 0;
+    bestStreak = 0;
+    jumping = false;
     jumpBtn.disabled = false;
     faceOk.style.display = '';
     faceBad.style.display = 'none';
+    splashFX.innerHTML = '';
+    setDiverTransform(DIVE_START.x, DIVE_START.y, 0);
     showFeedback('');
     updateReadout();
     modalOverlay.classList.remove('show');
@@ -411,27 +422,31 @@
   }
 
   jumpBtn.addEventListener('click', onJump);
-  document.addEventListener('keydown', function (event) {
-    if (event.code === 'Space') {
-      event.preventDefault();
-      if (!jumpBtn.disabled) onJump();
-    }
-  });
   document.getElementById('restartBtn').addEventListener('click', restart);
   document.getElementById('modalOkBtn').addEventListener('click', restart);
+
+  document.addEventListener('keydown', function (e) {
+    if (e.code === 'Space' || e.key === ' ' || e.key === 'Spacebar') {
+      e.preventDefault();
+      if (modalOverlay.classList.contains('show')) return;
+      onJump();
+    }
+  });
 
   // test-only hooks (harmless for normal play; used for automated verification)
   window.__phGameDebug = {
     setFraction: function (v) { t = v; renderPointer(); },
     getPH: function () { return currentPH(); },
     getZone: function () { return zoneFor(currentPH()); },
-    isRunning: function () { return running; }
+    isRunning: function () { return running; },
+    isJumping: function () { return jumping; },
+    getDiverTransform: function () { return diverEl.getAttribute('transform'); },
+    getSplashCount: function () { return splashFX.children.length; }
   };
 
   updateReadout();
   renderPointer();
   startLoop();
-  fetchBestScore();
 })();
 </script>
 

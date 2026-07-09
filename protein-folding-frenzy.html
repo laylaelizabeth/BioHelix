@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BONUS-01 :: Protein Folding -- Interactive Exercise</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 20px;
+    background: #ffffff;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    color: #000000;
+  }
+  #exercise {
+    max-width: 720px;
+    margin: 0 auto;
+    border: 2px solid #000000;
+    padding: 16px 20px 20px;
+  }
+  .tag {
+    display: inline-block;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    background: #f0f0f0;
+    border: 1px solid #000000;
+    padding: 2px 8px;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 22px;
+    margin: 4px 0 4px;
+  }
+  .instructions {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12.5px;
+    margin: 0 0 6px;
+    color: #333333;
+    line-height: 1.5;
+  }
+  .legend {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px;
+    margin: 0 0 14px;
+    color: #555555;
+  }
+  .legend .swatch {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    border: 1.5px solid #000000;
+    vertical-align: middle;
+    margin: 0 4px 0 12px;
+    position: relative;
+    top: -1px;
+  }
+
+  #board-wrap {
+    border: 1px solid #000000;
+    background: #fafcf8;
+    padding: 6px;
+    margin-bottom: 14px;
+  }
+  #board-wrap svg { width: 100%; height: auto; display: block; }
+
+  .bead { cursor: pointer; }
+  .bead.anchor { cursor: default; }
+  .bead circle {
+    stroke: #000000;
+    stroke-width: 2;
+  }
+  .bead text {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    font-weight: bold;
+    text-anchor: middle;
+    dominant-baseline: central;
+    fill: #000000;
+    pointer-events: none;
+  }
+  .bead.flash circle { stroke: #cc0000; stroke-width: 3; }
+
+  #statusbar {
+    margin-top: 4px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    border-top: 1px solid #000000;
+    padding-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  #statusbar .readout::after {
+    content: '_';
+    animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  #msg {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px;
+    color: #cc0000;
+    min-height: 16px;
+    margin-top: 6px;
+  }
+
+  #controls button {
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+    font-size: 12px;
+    background: #d4d0c8;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    padding: 5px 12px;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+  #controls button:active {
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+  }
+
+  #modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    align-items: center;
+    justify-content: center;
+  }
+  #modal-overlay.show { display: flex; }
+  #modal-box {
+    background: #d4d0c8;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    width: 300px;
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+  }
+  #modal-title {
+    background: #0000ee;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 8px;
+  }
+  #modal-body {
+    padding: 16px;
+    font-size: 13px;
+    text-align: center;
+  }
+  #modal-body button {
+    margin-top: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div id="exercise">
+  <span class="tag">BONUS-01 :: EXERCISE</span>
+  <h2>Protein Folding</h2>
+  <p class="instructions">&gt; Every amino acid in this chain is Hydrophobic (H) or Polar (P).<br>
+  &gt; Click a bead to rotate its bond and fold the chain. Bury the H's inside to lower the energy.</p>
+  <p class="legend">
+    HYDROPHOBIC (H)<span class="swatch" style="background:#e0a458"></span>
+    POLAR (P)<span class="swatch" style="background:#6f9fd8"></span>
+  </p>
+
+  <div id="board-wrap">
+    <svg id="board" viewBox="-350 -350 700 700" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse">
+          <path d="M28,0 L0,0 0,28" fill="none" stroke="#dfe8df" stroke-width="1"/>
+        </pattern>
+      </defs>
+      <rect x="-350" y="-350" width="700" height="700" fill="url(#grid)"/>
+      <g id="bonds"></g>
+      <g id="beads"></g>
+    </svg>
+  </div>
+
+  <div id="msg">&nbsp;</div>
+
+  <div id="statusbar">
+    <div class="readout" id="readout">ENERGY: 0&nbsp;&nbsp;&nbsp;CONTACTS: 0&nbsp;&nbsp;&nbsp;FOLDS: 0&nbsp;&nbsp;&nbsp;BEST: 0</div>
+    <div id="controls">
+      <button id="resetBtn">Reset Fold</button>
+      <button id="newSeqBtn">New Sequence</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-overlay">
+  <div id="modal-box">
+    <div id="modal-title">BIOHELIX.EXE</div>
+    <div id="modal-body">
+      <div>STABLE FOLD ACHIEVED.<br>HYDROPHOBIC CORE FORMED.</div>
+      <button id="modalOkBtn">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var CELL = 28;
+  var TARGET_CONTACTS = 2;
+  var DIR_ORDER = ['R', 'D', 'L', 'U'];
+  var DELTA = { R: [1, 0], L: [-1, 0], U: [0, 1], D: [0, -1] };
+
+  var sequence = ['H', 'H', 'H', 'P', 'P', 'P', 'H', 'H', 'H'];
+  var N = sequence.length;
+  var directions = []; // length N-1, values from DIR_ORDER
+  var positions = [];
+  var folds = 0;
+  var best = 0;
+  var milestoneShown = false;
+
+  var bondsG = document.getElementById('bonds');
+  var beadsG = document.getElementById('beads');
+  var readout = document.getElementById('readout');
+  var msgEl = document.getElementById('msg');
+
+  function resetDirections() {
+    directions = [];
+    for (var i = 0; i < N - 1; i++) directions.push('R');
+  }
+
+  function computePositions() {
+    var pos = [{ x: -4, y: 0 }];
+    for (var i = 0; i < directions.length; i++) {
+      var d = DELTA[directions[i]];
+      pos.push({ x: pos[i].x + d[0], y: pos[i].y + d[1] });
+    }
+    return pos;
+  }
+
+  function hasOverlap(pos) {
+    var seen = {};
+    for (var i = 0; i < pos.length; i++) {
+      var key = pos[i].x + ',' + pos[i].y;
+      if (seen[key]) return true;
+      seen[key] = true;
+    }
+    return false;
+  }
+
+  function countContacts(pos) {
+    var contacts = 0;
+    for (var i = 0; i < N; i++) {
+      if (sequence[i] !== 'H') continue;
+      for (var j = i + 2; j < N; j++) {
+        if (sequence[j] !== 'H') continue;
+        var dx = Math.abs(pos[i].x - pos[j].x);
+        var dy = Math.abs(pos[i].y - pos[j].y);
+        if (dx + dy === 1) contacts += 1;
+      }
+    }
+    return contacts;
+  }
+
+  function toPixel(p) {
+    return { x: p.x * CELL, y: -p.y * CELL };
+  }
+
+  function updateViewBox() {
+    var xs = positions.map(function (p) { return p.x; });
+    var ys = positions.map(function (p) { return p.y; });
+    var minX = Math.min.apply(null, xs), maxX = Math.max.apply(null, xs);
+    var minY = Math.min.apply(null, ys), maxY = Math.max.apply(null, ys);
+    var padCells = 1.6;
+    var left = (minX - padCells) * CELL;
+    var right = (maxX + padCells) * CELL;
+    var top = -(maxY + padCells) * CELL;
+    var bottom = -(minY - padCells) * CELL;
+    var w = right - left;
+    var h = bottom - top;
+    var size = Math.max(w, h, CELL * 4);
+    var cx = (left + right) / 2;
+    var cy = (top + bottom) / 2;
+    var board = document.getElementById('board');
+    board.setAttribute('viewBox', (cx - size / 2) + ' ' + (cy - size / 2) + ' ' + size + ' ' + size);
+  }
+
+  function render() {
+    positions = computePositions();
+    bondsG.innerHTML = '';
+    beadsG.innerHTML = '';
+
+    for (var i = 0; i < positions.length - 1; i++) {
+      var a = toPixel(positions[i]);
+      var b = toPixel(positions[i + 1]);
+      var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', a.x); line.setAttribute('y1', a.y);
+      line.setAttribute('x2', b.x); line.setAttribute('y2', b.y);
+      line.setAttribute('stroke', '#000000');
+      line.setAttribute('stroke-width', '3');
+      bondsG.appendChild(line);
+    }
+
+    positions.forEach(function (p, i) {
+      var px = toPixel(p);
+      var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.setAttribute('class', 'bead' + (i === 0 ? ' anchor' : ''));
+      g.setAttribute('transform', 'translate(' + px.x + ',' + px.y + ')');
+      g.dataset.index = i;
+
+      var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('r', CELL * 0.4);
+      circle.setAttribute('fill', sequence[i] === 'H' ? '#e0a458' : '#6f9fd8');
+      g.appendChild(circle);
+
+      var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('y', 1);
+      text.textContent = sequence[i];
+      g.appendChild(text);
+
+      if (i > 0) {
+        g.addEventListener('click', function () { onBeadClick(i); });
+      }
+      beadsG.appendChild(g);
+    });
+
+    updateViewBox();
+    updateReadout();
+  }
+
+  function updateReadout() {
+    var contacts = countContacts(positions);
+    var energy = -contacts;
+    if (contacts > best) best = contacts;
+    readout.innerHTML = 'ENERGY: ' + energy + '&nbsp;&nbsp;&nbsp;CONTACTS: ' + contacts +
+      '&nbsp;&nbsp;&nbsp;FOLDS: ' + folds + '&nbsp;&nbsp;&nbsp;BEST: ' + best;
+    if (contacts >= TARGET_CONTACTS && !milestoneShown) {
+      milestoneShown = true;
+      document.getElementById('modal-overlay').classList.add('show');
+    }
+    return contacts;
+  }
+
+  function flashBead(index) {
+    var g = beadsG.querySelector('[data-index="' + index + '"]');
+    if (!g) return;
+    g.classList.add('flash');
+    setTimeout(function () { g.classList.remove('flash'); }, 400);
+  }
+
+  function onBeadClick(i) {
+    var jointIndex = i - 1; // directions index that controls bead i
+    var current = directions[jointIndex];
+    var currentPos = DIR_ORDER.indexOf(current);
+    var next = DIR_ORDER[(currentPos + 1) % DIR_ORDER.length];
+    var prevDirections = directions.slice();
+    directions[jointIndex] = next;
+
+    var newPos = computePositions();
+    if (hasOverlap(newPos)) {
+      directions = prevDirections;
+      msgEl.textContent = 'FOLD BLOCKED -- CHAIN WOULD OVERLAP. TRY AGAIN.';
+      flashBead(i);
+      return;
+    }
+    msgEl.textContent = '';
+    folds += 1;
+    render();
+  }
+
+  function randomSequence() {
+    var seq = [];
+    for (var i = 0; i < N; i++) {
+      seq.push(Math.random() < 0.5 ? 'H' : 'P');
+    }
+    return seq;
+  }
+
+  document.getElementById('resetBtn').addEventListener('click', function () {
+    resetDirections();
+    folds = 0;
+    best = 0;
+    milestoneShown = false;
+    msgEl.textContent = '';
+    document.getElementById('modal-overlay').classList.remove('show');
+    render();
+  });
+
+  document.getElementById('newSeqBtn').addEventListener('click', function () {
+    sequence = randomSequence();
+    resetDirections();
+    folds = 0;
+    best = 0;
+    milestoneShown = false;
+    msgEl.textContent = '';
+    document.getElementById('modal-overlay').classList.remove('show');
+    render();
+  });
+
+  document.getElementById('modalOkBtn').addEventListener('click', function () {
+    document.getElementById('modal-overlay').classList.remove('show');
+  });
+
+  resetDirections();
+  render();
+})();
+</script>
+
+</body>
+</html>

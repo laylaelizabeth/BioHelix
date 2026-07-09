@@ -420,7 +420,9 @@ function entryRow(t) {
     noteHtml = '<a href="ecosystems-food-webs-exercise.html">[ open interactive exercise for this topic ]</a>';
   }
   var idHtml = t.id;
-  if (t.id === "BIO-02") {
+  if (t.id === "BIO-01") {
+    idHtml += '<img class="entry-id-preview" src="cell-structure-icon.png" alt="Cell structure icon preview for BIO-01 exercise">';
+  } else if (t.id === "BIO-02") {
     idHtml += '<img class="entry-id-preview entry-id-preview-dna" src="dna-genetic-code-icon.png" alt="DNA icon preview for BIO-02 exercise">';
   } else if (t.id === "BIO-03") {
     idHtml += '<img class="entry-id-preview" src="photosynthesis-respiration-icon.png" alt="Photosynthesis and respiration icon preview for BIO-03 exercise">';

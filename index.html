@@ -177,6 +177,10 @@
     height: auto;
     margin-top: 8px;
   }
+  .entry-id-preview-virus {
+    padding: 4px;
+    box-sizing: border-box;
+  }
   table.entry h3 {
     margin: 0 0 6px;
     font-size: 16px;
@@ -414,7 +418,7 @@ function entryRow(t) {
   }
   var idHtml = t.id;
   if (t.id === "BIO-05") {
-    idHtml += '<img class="entry-id-preview" src="virus-icon.png" alt="Virus icon preview for BIO-05 exercise">';
+    idHtml += '<img class="entry-id-preview entry-id-preview-virus" src="virus-icon.png" alt="Virus icon preview for BIO-05 exercise">';
   } else if (t.id === "BIO-06") {
     idHtml += '<img class="entry-id-preview" src="frog-icon.png" alt="Frog icon preview for BIO-06 exercise">';
   }

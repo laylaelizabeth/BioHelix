@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BIO-05 :: The Immune System -- Interactive Exercise</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 20px;
+    background: #ffffff;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    color: #000000;
+  }
+  #exercise {
+    max-width: 720px;
+    margin: 0 auto;
+    border: 2px solid #000000;
+    padding: 16px 20px 20px;
+  }
+  .tag {
+    display: inline-block;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    background: #f0f0f0;
+    border: 1px solid #000000;
+    padding: 2px 8px;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 22px;
+    margin: 4px 0 4px;
+  }
+  .instructions {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    margin: 0 0 14px;
+    color: #333333;
+  }
+  #stage {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  #diagram-wrap {
+    flex: 1 1 340px;
+    border: 1px solid #000000;
+    background: #fdf7f7;
+    padding: 6px;
+  }
+  #diagram-wrap svg { width: 100%; height: auto; display: block; }
+
+  .pin { cursor: pointer; }
+  .pin circle.dot {
+    fill: #ffffff;
+    stroke: #000000;
+    stroke-width: 2;
+  }
+  .pin text.num {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    font-weight: bold;
+    fill: #000000;
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+  .pin.solved circle.dot {
+    fill: #dbe8ff;
+    stroke: #0000ee;
+  }
+  .pin.solved text.num { display: none; }
+  .pin.solved text.label {
+    font-family: Georgia, serif;
+    font-size: 10.5px;
+    font-weight: bold;
+    fill: #0000ee;
+    text-anchor: middle;
+  }
+  .pin.wrong circle.dot {
+    fill: #ffd9d9;
+    stroke: #cc0000;
+  }
+
+  #wordbank {
+    flex: 1 1 220px;
+    min-width: 200px;
+  }
+  #wordbank h3 {
+    font-size: 14px;
+    margin: 0 0 8px;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: normal;
+    border-bottom: 1px dashed #000000;
+    padding-bottom: 4px;
+  }
+  .word-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    margin-bottom: 8px;
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+    font-size: 13px;
+    background: #d4d0c8;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    padding: 7px 10px;
+    cursor: pointer;
+  }
+  .word-btn:active {
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+  }
+  .word-btn.armed {
+    background: #0000ee;
+    color: #ffffff;
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+  }
+  .word-btn.used {
+    background: #f0f0f0;
+    color: #999999;
+    text-decoration: line-through;
+    cursor: default;
+    border: 1px solid #cccccc;
+  }
+
+  #statusbar {
+    margin-top: 16px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    border-top: 1px solid #000000;
+    padding-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  #statusbar .readout::after {
+    content: '_';
+    animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  #controls button {
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+    font-size: 12px;
+    background: #d4d0c8;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    padding: 5px 12px;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+  #controls button:active {
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+  }
+
+  #modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    align-items: center;
+    justify-content: center;
+  }
+  #modal-overlay.show { display: flex; }
+  #modal-box {
+    background: #d4d0c8;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    width: 300px;
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+  }
+  #modal-title {
+    background: #0000ee;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 8px;
+  }
+  #modal-body {
+    padding: 16px;
+    font-size: 13px;
+    text-align: center;
+  }
+  #modal-body button {
+    margin-top: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div id="exercise">
+  <span class="tag">BIO-05 :: EXERCISE</span>
+  <h2>The Immune System</h2>
+  <p class="instructions">&gt; Click a term below, then click the matching cell in the bloodstream scene.</p>
+
+  <div id="stage">
+    <div id="diagram-wrap">
+      <svg viewBox="0 0 400 320" xmlns="http://www.w3.org/2000/svg">
+
+        <!-- decorative red blood cells (not clickable, just scenery) -->
+        <g fill="#e08a8a" stroke="#b05a5a" stroke-width="1">
+          <ellipse cx="40" cy="150" rx="15" ry="9"/>
+          <ellipse cx="368" cy="140" rx="15" ry="9"/>
+          <ellipse cx="45" cy="290" rx="15" ry="9"/>
+          <ellipse cx="250" cy="25" rx="15" ry="9"/>
+          <ellipse cx="365" cy="290" rx="14" ry="8"/>
+        </g>
+        <g fill="#f2b6b6">
+          <ellipse cx="40" cy="150" rx="6" ry="3"/>
+          <ellipse cx="368" cy="140" rx="6" ry="3"/>
+          <ellipse cx="45" cy="290" rx="6" ry="3"/>
+          <ellipse cx="250" cy="25" rx="6" ry="3"/>
+          <ellipse cx="365" cy="290" rx="5.5" ry="2.8"/>
+        </g>
+
+        <!-- virus -->
+        <g transform="translate(90,68)">
+          <g stroke="#000000" stroke-width="2">
+            <line x1="0" y1="-16" x2="0" y2="-24"/><circle cx="0" cy="-26" r="2.5" fill="#cfe0d8"/>
+            <line x1="11.3" y1="-11.3" x2="17" y2="-17"/><circle cx="18.7" cy="-18.7" r="2.5" fill="#cfe0d8"/>
+            <line x1="16" y1="0" x2="24" y2="0"/><circle cx="26" cy="0" r="2.5" fill="#cfe0d8"/>
+            <line x1="11.3" y1="11.3" x2="17" y2="17"/><circle cx="18.7" cy="18.7" r="2.5" fill="#cfe0d8"/>
+            <line x1="0" y1="16" x2="0" y2="24"/><circle cx="0" cy="26" r="2.5" fill="#cfe0d8"/>
+            <line x1="-11.3" y1="11.3" x2="-17" y2="17"/><circle cx="-18.7" cy="18.7" r="2.5" fill="#cfe0d8"/>
+            <line x1="-16" y1="0" x2="-24" y2="0"/><circle cx="-26" cy="0" r="2.5" fill="#cfe0d8"/>
+            <line x1="-11.3" y1="-11.3" x2="-17" y2="-17"/><circle cx="-18.7" cy="-18.7" r="2.5" fill="#cfe0d8"/>
+          </g>
+          <circle r="16" fill="#cfe0d8" stroke="#000000" stroke-width="2"/>
+        </g>
+
+        <!-- bacteria -->
+        <g transform="translate(300,58) rotate(-15)">
+          <path d="M-15,-9 C-15,-18 15,-18 22,-9 C29,0 29,9 22,9 C15,18 -15,18 -15,9 C-22,0 -22,-9 -15,-9 Z" fill="#f5e6c8" stroke="#000000" stroke-width="2"/>
+          <path d="M24,-3 C30,-6 34,-4 36,-8" fill="none" stroke="#555555" stroke-width="1.5"/>
+          <path d="M24,4 C30,7 34,5 37,9" fill="none" stroke="#555555" stroke-width="1.5"/>
+        </g>
+
+        <!-- T cell -->
+        <g transform="translate(205,120)">
+          <g stroke="#000000" stroke-width="1.3">
+            <line x1="0" y1="-20" x2="0" y2="-26"/>
+            <line x1="14.1" y1="-14.1" x2="18.4" y2="-18.4"/>
+            <line x1="20" y1="0" x2="26" y2="0"/>
+            <line x1="14.1" y1="14.1" x2="18.4" y2="18.4"/>
+            <line x1="0" y1="20" x2="0" y2="26"/>
+            <line x1="-14.1" y1="14.1" x2="-18.4" y2="18.4"/>
+            <line x1="-20" y1="0" x2="-26" y2="0"/>
+            <line x1="-14.1" y1="-14.1" x2="-18.4" y2="-18.4"/>
+            <line x1="10" y1="-17.3" x2="13" y2="-22.5"/>
+            <line x1="17.3" y1="-10" x2="22.5" y2="-13"/>
+            <line x1="17.3" y1="10" x2="22.5" y2="13"/>
+            <line x1="10" y1="17.3" x2="13" y2="22.5"/>
+            <line x1="-10" y1="17.3" x2="-13" y2="22.5"/>
+            <line x1="-17.3" y1="10" x2="-22.5" y2="13"/>
+            <line x1="-17.3" y1="-10" x2="-22.5" y2="-13"/>
+            <line x1="-10" y1="-17.3" x2="-13" y2="-22.5"/>
+          </g>
+          <circle r="20" fill="#e6d9f2" stroke="#000000" stroke-width="2"/>
+        </g>
+
+        <!-- macrophage engulfing a germ -->
+        <g transform="translate(315,215)">
+          <path d="M-40,-6 C-46,-24 -22,-34 -2,-30 C18,-34 42,-24 40,-4 C46,14 26,32 4,30 C-16,36 -42,20 -40,-6 Z"
+                fill="#d9ead3" stroke="#000000" stroke-width="2"/>
+          <circle cx="34" cy="-2" r="7" fill="#8a8a8a" stroke="#000000" stroke-width="1.5"/>
+        </g>
+
+        <!-- antibody (Y shape) -->
+        <g transform="translate(90,232)" stroke="#4455bb" stroke-width="6" stroke-linecap="round" fill="none">
+          <line x1="0" y1="0" x2="0" y2="20"/>
+          <line x1="0" y1="0" x2="-16" y2="-18"/>
+          <line x1="0" y1="0" x2="16" y2="-18"/>
+        </g>
+
+        <!-- white blood cell -->
+        <g transform="translate(210,270)">
+          <circle r="27" fill="#fdf7e3" stroke="#000000" stroke-width="2"/>
+          <circle cx="8" cy="-14" r="8" fill="#c9b98a" stroke="#000000" stroke-width="1"/>
+          <circle cx="8" cy="14" r="8" fill="#c9b98a" stroke="#000000" stroke-width="1"/>
+          <circle cx="-16" cy="0" r="8" fill="#c9b98a" stroke="#000000" stroke-width="1"/>
+        </g>
+
+        <!-- numbered pins, centered on each icon above -->
+        <g class="pin" data-answer="virus" transform="translate(90,68)">
+          <circle class="dot" r="13"/><text class="num" y="1">1</text>
+          <text class="label" y="4" style="display:none">Virus</text>
+        </g>
+        <g class="pin" data-answer="bacteria" transform="translate(300,58)">
+          <circle class="dot" r="13"/><text class="num" y="1">2</text>
+          <text class="label" y="4" style="display:none">Bacteria</text>
+        </g>
+        <g class="pin" data-answer="tcell" transform="translate(205,120)">
+          <circle class="dot" r="13"/><text class="num" y="1">3</text>
+          <text class="label" y="4" style="display:none">T Cell</text>
+        </g>
+        <g class="pin" data-answer="macrophage" transform="translate(315,215)">
+          <circle class="dot" r="13"/><text class="num" y="1">4</text>
+          <text class="label" y="4" style="display:none">Macrophage</text>
+        </g>
+        <g class="pin" data-answer="antibody" transform="translate(90,232)">
+          <circle class="dot" r="13"/><text class="num" y="1">5</text>
+          <text class="label" y="4" style="display:none">Antibody</text>
+        </g>
+        <g class="pin" data-answer="wbc" transform="translate(210,270)">
+          <circle class="dot" r="13"/><text class="num" y="1">6</text>
+          <text class="label" y="4" style="display:none">White Blood Cell</text>
+        </g>
+      </svg>
+    </div>
+
+    <div id="wordbank">
+      <h3>&gt; TERM BANK</h3>
+      <div id="words"></div>
+    </div>
+  </div>
+
+  <div id="statusbar">
+    <div class="readout" id="readout">MATCHED: 0/6&nbsp;&nbsp;&nbsp;MISTAKES: 0</div>
+    <div id="controls">
+      <button id="newRoundBtn">New Round</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-overlay">
+  <div id="modal-box">
+    <div id="modal-title">BIOHELIX.EXE</div>
+    <div id="modal-body">
+      <div>PATHOGENS CLEARED.<br>IMMUNE RESPONSE SUCCESSFUL.</div>
+      <button id="modalOkBtn">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var TERMS = [
+    { key: 'virus', label: 'Virus' },
+    { key: 'bacteria', label: 'Bacteria' },
+    { key: 'tcell', label: 'T Cell' },
+    { key: 'macrophage', label: 'Macrophage' },
+    { key: 'antibody', label: 'Antibody' },
+    { key: 'wbc', label: 'White Blood Cell' }
+  ];
+
+  var wordsEl = document.getElementById('words');
+  var readout = document.getElementById('readout');
+  var pins = Array.prototype.slice.call(document.querySelectorAll('.pin'));
+  var armedKey = null;
+  var matched = 0;
+  var mistakes = 0;
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  function renderWords() {
+    wordsEl.innerHTML = '';
+    shuffle(TERMS).forEach(function (t) {
+      var btn = document.createElement('button');
+      btn.className = 'word-btn';
+      btn.type = 'button';
+      btn.textContent = t.label;
+      btn.dataset.key = t.key;
+      btn.addEventListener('click', function () {
+        if (btn.classList.contains('used')) return;
+        document.querySelectorAll('.word-btn').forEach(function (b) { b.classList.remove('armed'); });
+        armedKey = t.key;
+        btn.classList.add('armed');
+      });
+      wordsEl.appendChild(btn);
+    });
+  }
+
+  function updateReadout() {
+    readout.innerHTML = 'MATCHED: ' + matched + '/6&nbsp;&nbsp;&nbsp;MISTAKES: ' + mistakes;
+  }
+
+  function disableWord(key) {
+    var btn = wordsEl.querySelector('[data-key="' + key + '"]');
+    if (btn) {
+      btn.classList.remove('armed');
+      btn.classList.add('used');
+    }
+  }
+
+  pins.forEach(function (pin) {
+    pin.addEventListener('click', function () {
+      if (pin.classList.contains('solved') || !armedKey) return;
+      var answer = pin.dataset.answer;
+      if (armedKey === answer) {
+        pin.classList.add('solved');
+        pin.querySelector('.label').style.display = '';
+        var term = TERMS.filter(function (t) { return t.key === answer; })[0];
+        pin.querySelector('.label').textContent = term.label;
+        disableWord(answer);
+        matched += 1;
+        armedKey = null;
+        updateReadout();
+        if (matched === 6) {
+          document.getElementById('modal-overlay').classList.add('show');
+        }
+      } else {
+        mistakes += 1;
+        pin.classList.add('wrong');
+        setTimeout(function () { pin.classList.remove('wrong'); }, 500);
+        armedKey = null;
+        document.querySelectorAll('.word-btn').forEach(function (b) { b.classList.remove('armed'); });
+        updateReadout();
+      }
+    });
+  });
+
+  document.getElementById('newRoundBtn').addEventListener('click', function () {
+    matched = 0;
+    mistakes = 0;
+    armedKey = null;
+    pins.forEach(function (pin) {
+      pin.classList.remove('solved', 'wrong');
+      pin.querySelector('.label').style.display = 'none';
+    });
+    document.getElementById('modal-overlay').classList.remove('show');
+    renderWords();
+    updateReadout();
+  });
+
+  document.getElementById('modalOkBtn').addEventListener('click', function () {
+    document.getElementById('modal-overlay').classList.remove('show');
+  });
+
+  renderWords();
+  updateReadout();
+})();
+</script>
+
+</body>
+</html>

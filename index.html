@@ -177,6 +177,9 @@
     height: auto;
     margin-top: 8px;
   }
+  .entry-id-preview-dna {
+    width: 64px;
+  }
   .entry-id-preview-virus {
     padding: 4px;
     box-sizing: border-box;
@@ -418,7 +421,7 @@ function entryRow(t) {
   }
   var idHtml = t.id;
   if (t.id === "BIO-02") {
-    idHtml += '<img class="entry-id-preview" src="dna-genetic-code-icon.png" alt="DNA icon preview for BIO-02 exercise">';
+    idHtml += '<img class="entry-id-preview entry-id-preview-dna" src="dna-genetic-code-icon.png" alt="DNA icon preview for BIO-02 exercise">';
   } else if (t.id === "BIO-03") {
     idHtml += '<img class="entry-id-preview" src="photosynthesis-respiration-icon.png" alt="Photosynthesis and respiration icon preview for BIO-03 exercise">';
   } else if (t.id === "BIO-04") {

@@ -211,6 +211,8 @@
 (function () {
   var CELL = 28;
   var TARGET_CONTACTS = 2;
+  var API_BASE = 'https://biohelix-production.up.railway.app';
+  var GAME_KEY = 'protein-folding-frenzy';
   var DIR_ORDER = ['R', 'D', 'L', 'U'];
   var DELTA = { R: [1, 0], L: [-1, 0], U: [0, 1], D: [0, -1] };
 
@@ -220,6 +222,7 @@
   var positions = [];
   var folds = 0;
   var best = 0;
+  var bestLoaded = false;
   var milestoneShown = false;
 
   var bondsG = document.getElementById('bonds');
@@ -334,14 +337,58 @@
   function updateReadout() {
     var contacts = countContacts(positions);
     var energy = -contacts;
-    if (contacts > best) best = contacts;
+    if (contacts > best) {
+      best = contacts;
+      submitBestScore(contacts);
+    }
     readout.innerHTML = 'ENERGY: ' + energy + '&nbsp;&nbsp;&nbsp;CONTACTS: ' + contacts +
       '&nbsp;&nbsp;&nbsp;FOLDS: ' + folds + '&nbsp;&nbsp;&nbsp;BEST: ' + best;
+    if (!bestLoaded) {
+      readout.innerHTML += '&nbsp;&nbsp;&nbsp;(SYNCING...)';
+    }
     if (contacts >= TARGET_CONTACTS && !milestoneShown) {
       milestoneShown = true;
       document.getElementById('modal-overlay').classList.add('show');
     }
     return contacts;
+  }
+
+  function fetchBestScore() {
+    return fetch(API_BASE + '/api/highscore?game=' + encodeURIComponent(GAME_KEY))
+      .then(function (response) {
+        if (!response.ok) throw new Error('Could not load best score.');
+        return response.json();
+      })
+      .then(function (data) {
+        if (typeof data.best === 'number' && data.best > best) {
+          best = data.best;
+        }
+        bestLoaded = true;
+        updateReadout();
+      })
+      .catch(function () {
+        bestLoaded = true;
+        updateReadout();
+      });
+  }
+
+  function submitBestScore(score) {
+    return fetch(API_BASE + '/api/highscore', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ game: GAME_KEY, score: score })
+    })
+      .then(function (response) {
+        if (!response.ok) throw new Error('Could not save best score.');
+        return response.json();
+      })
+      .then(function (data) {
+        if (typeof data.best === 'number' && data.best !== best) {
+          best = data.best;
+          updateReadout();
+        }
+      })
+      .catch(function () {});
   }
 
   function flashBead(index) {
@@ -382,7 +429,6 @@
   document.getElementById('resetBtn').addEventListener('click', function () {
     resetDirections();
     folds = 0;
-    best = 0;
     milestoneShown = false;
     msgEl.textContent = '';
     document.getElementById('modal-overlay').classList.remove('show');
@@ -393,7 +439,6 @@
     sequence = randomSequence();
     resetDirections();
     folds = 0;
-    best = 0;
     milestoneShown = false;
     msgEl.textContent = '';
     document.getElementById('modal-overlay').classList.remove('show');
@@ -406,6 +451,7 @@
 
   resetDirections();
   render();
+  fetchBestScore();
 })();
 </script>
 

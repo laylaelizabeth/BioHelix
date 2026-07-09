@@ -1,4 +1,5 @@
 import os
+import sqlite3
 from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 import requests
@@ -8,10 +9,84 @@ load_dotenv()
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
+DB_PATH = os.path.join(os.path.dirname(__file__), 'biohelix.db')
+
+
+def init_db():
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute(
+        '''
+        CREATE TABLE IF NOT EXISTS high_scores (
+            game TEXT PRIMARY KEY,
+            best INTEGER NOT NULL DEFAULT 0,
+            updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+        '''
+    )
+    conn.commit()
+    conn.close()
+
+
+def get_best_score(game):
+    conn = sqlite3.connect(DB_PATH)
+    row = conn.execute('SELECT best FROM high_scores WHERE game = ?', (game,)).fetchone()
+    conn.close()
+    return int(row[0]) if row else 0
+
+
+def upsert_best_score(game, score):
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute(
+        '''
+        INSERT INTO high_scores (game, best)
+        VALUES (?, ?)
+        ON CONFLICT(game) DO UPDATE SET
+            best = CASE
+                WHEN excluded.best > high_scores.best THEN excluded.best
+                ELSE high_scores.best
+            END,
+            updated_at = CURRENT_TIMESTAMP
+        ''',
+        (game, score)
+    )
+    row = conn.execute('SELECT best FROM high_scores WHERE game = ?', (game,)).fetchone()
+    conn.commit()
+    conn.close()
+    return int(row[0]) if row else 0
+
+
+init_db()
 
 @app.route('/')
 def serve_index():
     return send_file('index.html')
+
+
+@app.route('/api/highscore', methods=['GET'])
+def get_highscore():
+    game = (request.args.get('game') or '').strip()
+    if not game:
+        return jsonify({'error': 'Game is required'}), 400
+    return jsonify({'game': game, 'best': get_best_score(game)})
+
+
+@app.route('/api/highscore', methods=['POST'])
+def save_highscore():
+    data = request.get_json() or {}
+    game = str(data.get('game', '')).strip()
+    score_raw = data.get('score')
+    if not game:
+        return jsonify({'error': 'Game is required'}), 400
+    if not isinstance(score_raw, int) or score_raw < 0:
+        return jsonify({'error': 'Score must be a non-negative integer'}), 400
+
+    previous_best = get_best_score(game)
+    new_best = upsert_best_score(game, score_raw)
+    return jsonify({
+        'game': game,
+        'best': new_best,
+        'is_new_best': new_best > previous_best
+    })
 
 @app.route('/api/ask', methods=['POST'])
 def ask_lab_ai():

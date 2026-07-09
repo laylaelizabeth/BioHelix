@@ -278,6 +278,23 @@
     font-size: 12px;
     line-height: 1.7;
   }
+  #miniGamesSidebar .mini-icon {
+    width: 14px;
+    height: 14px;
+    vertical-align: -2px;
+    margin-right: 6px;
+  }
+  #miniGamesSidebar a.protein-frenzy-link {
+    color: #1e88e5;
+    font-weight: bold;
+    background: linear-gradient(90deg, #1e88e5 0%, #1e88e5 52%, #e67e22 52%, #e67e22 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  #miniGamesSidebar a.protein-frenzy-link:visited {
+    color: #1e88e5;
+  }
   @media (max-width: 700px) {
     #miniGamesSidebar {
       float: none;
@@ -299,7 +316,7 @@
   <aside id="miniGamesSidebar">
     <h3>Additional Mini Games</h3>
     <ul>
-      <li><a href="protein-folding-frenzy.html">Protein Folding Frenzy</a></li>
+      <li><a class="protein-frenzy-link" href="protein-folding-frenzy.html"><img class="mini-icon" src="protein-folding-icon.png" alt="">Protein Folding Frenzy</a></li>
       <li><a href="acids-neutral-dive.html">Acids and Bases: Neutral Dive</a></li>
     </ul>
   </aside>

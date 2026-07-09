@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BIO-03 :: Photosynthesis and Cellular Respiration -- Interactive Exercise</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 20px;
+    background: #ffffff;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    color: #000000;
+  }
+  #exercise {
+    max-width: 720px;
+    margin: 0 auto;
+    border: 2px solid #000000;
+    padding: 16px 20px 20px;
+  }
+  .tag {
+    display: inline-block;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    background: #f0f0f0;
+    border: 1px solid #000000;
+    padding: 2px 8px;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 22px;
+    margin: 4px 0 4px;
+  }
+  .instructions {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    margin: 0 0 18px;
+    color: #333333;
+  }
+
+  .equation-block {
+    border: 1px solid #000000;
+    background: #fafafa;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+  }
+  .equation-title {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    border-bottom: 1px dashed #000000;
+    padding-bottom: 6px;
+  }
+  .equation-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+  .op {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 0 2px;
+  }
+  .fixed-label {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px;
+    font-style: italic;
+    color: #555555;
+    padding: 0 4px;
+  }
+  .tile {
+    min-width: 74px;
+    height: 40px;
+    border: 2px solid #000000;
+    background: #ffffff;
+    color: #bbbbbb;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    cursor: pointer;
+  }
+  .tile.solved {
+    background: #dbe8ff;
+    border-color: #0000ee;
+    color: #0000ee;
+    cursor: default;
+  }
+  .tile.wrong {
+    background: #ffd9d9;
+    border-color: #cc0000;
+  }
+
+  #palette {
+    text-align: center;
+    margin: 18px 0 6px;
+  }
+  #palette h3 {
+    font-size: 14px;
+    margin: 0 0 8px;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: normal;
+    border-bottom: 1px dashed #000000;
+    padding-bottom: 4px;
+  }
+  .term-btn {
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    background: #d4d0c8;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    padding: 8px 12px;
+    cursor: pointer;
+    margin: 4px;
+  }
+  .term-btn:active {
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+  }
+  .term-btn.armed {
+    background: #0000ee;
+    color: #ffffff;
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+  }
+
+  #statusbar {
+    margin-top: 16px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    border-top: 1px solid #000000;
+    padding-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  #statusbar .readout::after {
+    content: '_';
+    animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  #controls button {
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+    font-size: 12px;
+    background: #d4d0c8;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    padding: 5px 12px;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+  #controls button:active {
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+  }
+
+  #modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    align-items: center;
+    justify-content: center;
+  }
+  #modal-overlay.show { display: flex; }
+  #modal-box {
+    background: #d4d0c8;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    width: 300px;
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+  }
+  #modal-title {
+    background: #0000ee;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 8px;
+  }
+  #modal-body {
+    padding: 16px;
+    font-size: 13px;
+    text-align: center;
+  }
+  #modal-body button {
+    margin-top: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div id="exercise">
+  <span class="tag">BIO-03 :: EXERCISE</span>
+  <h2>Photosynthesis and Cellular Respiration</h2>
+  <p class="instructions">&gt; Click a term below, then click the blank it belongs in. Terms may be reused.</p>
+
+  <div class="equation-block">
+    <div class="equation-title">PHOTOSYNTHESIS (in the Chloroplast)</div>
+    <div class="equation-row" id="photoRow"></div>
+  </div>
+
+  <div class="equation-block">
+    <div class="equation-title">CELLULAR RESPIRATION (in the Mitochondrion)</div>
+    <div class="equation-row" id="respRow"></div>
+  </div>
+
+  <div id="palette">
+    <h3>&gt; TERM BANK</h3>
+    <button class="term-btn" data-term="CO2">CO2</button>
+    <button class="term-btn" data-term="H2O">H2O</button>
+    <button class="term-btn" data-term="Glucose">Glucose</button>
+    <button class="term-btn" data-term="O2">O2</button>
+    <button class="term-btn" data-term="ATP">ATP</button>
+  </div>
+
+  <div id="statusbar">
+    <div class="readout" id="readout">FILLED: 0/9&nbsp;&nbsp;&nbsp;MISTAKES: 0</div>
+    <div id="controls">
+      <button id="newRoundBtn">New Round</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-overlay">
+  <div id="modal-box">
+    <div id="modal-title">BIOHELIX.EXE</div>
+    <div id="modal-body">
+      <div>BOTH EQUATIONS BALANCED.<br>ENERGY CYCLE COMPLETE.</div>
+      <button id="modalOkBtn">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var TOTAL_SLOTS = 9;
+
+  // photosynthesis: 6CO2 + 6H2O + light --> glucose + 6O2
+  var photoSpec = [
+    { type: 'slot', answer: 'CO2' },
+    { type: 'op', text: '+' },
+    { type: 'slot', answer: 'H2O' },
+    { type: 'op', text: '+' },
+    { type: 'label', text: '(Light Energy)' },
+    { type: 'op', text: '→' },
+    { type: 'slot', answer: 'Glucose' },
+    { type: 'op', text: '+' },
+    { type: 'slot', answer: 'O2' }
+  ];
+
+  // cellular respiration: glucose + 6O2 --> 6CO2 + 6H2O + ATP
+  var respSpec = [
+    { type: 'slot', answer: 'Glucose' },
+    { type: 'op', text: '+' },
+    { type: 'slot', answer: 'O2' },
+    { type: 'op', text: '→' },
+    { type: 'slot', answer: 'CO2' },
+    { type: 'op', text: '+' },
+    { type: 'slot', answer: 'H2O' },
+    { type: 'op', text: '+' },
+    { type: 'slot', answer: 'ATP' },
+    { type: 'label', text: '(Energy)' }
+  ];
+
+  var photoRow = document.getElementById('photoRow');
+  var respRow = document.getElementById('respRow');
+  var readout = document.getElementById('readout');
+  var termBtns = Array.prototype.slice.call(document.querySelectorAll('.term-btn'));
+
+  var armedTerm = null;
+  var matched = 0;
+  var mistakes = 0;
+
+  function renderRow(container, spec) {
+    container.innerHTML = '';
+    spec.forEach(function (item) {
+      if (item.type === 'op') {
+        var op = document.createElement('span');
+        op.className = 'op';
+        op.textContent = item.text;
+        container.appendChild(op);
+      } else if (item.type === 'label') {
+        var lbl = document.createElement('span');
+        lbl.className = 'fixed-label';
+        lbl.textContent = item.text;
+        container.appendChild(lbl);
+      } else if (item.type === 'slot') {
+        var tile = document.createElement('div');
+        tile.className = 'tile';
+        tile.textContent = '?';
+        tile.dataset.answer = item.answer;
+        tile.addEventListener('click', onSlotClick);
+        container.appendChild(tile);
+      }
+    });
+  }
+
+  function updateReadout() {
+    readout.innerHTML = 'FILLED: ' + matched + '/' + TOTAL_SLOTS + '&nbsp;&nbsp;&nbsp;MISTAKES: ' + mistakes;
+  }
+
+  function onSlotClick(e) {
+    var slot = e.currentTarget;
+    if (slot.classList.contains('solved') || !armedTerm) return;
+    if (armedTerm === slot.dataset.answer) {
+      slot.classList.add('solved');
+      slot.textContent = armedTerm;
+      matched += 1;
+      armedTerm = null;
+      termBtns.forEach(function (b) { b.classList.remove('armed'); });
+      updateReadout();
+      if (matched === TOTAL_SLOTS) {
+        document.getElementById('modal-overlay').classList.add('show');
+      }
+    } else {
+      mistakes += 1;
+      slot.classList.add('wrong');
+      setTimeout(function () { slot.classList.remove('wrong'); }, 500);
+      armedTerm = null;
+      termBtns.forEach(function (b) { b.classList.remove('armed'); });
+      updateReadout();
+    }
+  }
+
+  termBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      termBtns.forEach(function (b) { b.classList.remove('armed'); });
+      armedTerm = btn.dataset.term;
+      btn.classList.add('armed');
+    });
+  });
+
+  document.getElementById('newRoundBtn').addEventListener('click', function () {
+    matched = 0;
+    mistakes = 0;
+    armedTerm = null;
+    termBtns.forEach(function (b) { b.classList.remove('armed'); });
+    document.getElementById('modal-overlay').classList.remove('show');
+    renderRow(photoRow, photoSpec);
+    renderRow(respRow, respSpec);
+    updateReadout();
+  });
+
+  document.getElementById('modalOkBtn').addEventListener('click', function () {
+    document.getElementById('modal-overlay').classList.remove('show');
+  });
+
+  renderRow(photoRow, photoSpec);
+  renderRow(respRow, respSpec);
+  updateReadout();
+})();
+</script>
+
+</body>
+</html>

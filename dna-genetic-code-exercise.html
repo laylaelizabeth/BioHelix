@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BIO-02 :: DNA and the Genetic Code -- Interactive Exercise</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 20px;
+    background: #ffffff;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    color: #000000;
+  }
+  #exercise {
+    max-width: 640px;
+    margin: 0 auto;
+    border: 2px solid #000000;
+    padding: 16px 20px 20px;
+  }
+  .tag {
+    display: inline-block;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    background: #f0f0f0;
+    border: 1px solid #000000;
+    padding: 2px 8px;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 22px;
+    margin: 4px 0 4px;
+  }
+  .instructions {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    margin: 0 0 10px;
+    color: #333333;
+  }
+  .rule-box {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    border: 1px dashed #000000;
+    background: #fafafa;
+    padding: 8px 12px;
+    text-align: center;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+  }
+
+  #ladder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 22px;
+  }
+  .base-row {
+    display: flex;
+    gap: 8px;
+  }
+  .rung-row {
+    display: flex;
+    gap: 8px;
+    margin: 2px 0;
+  }
+  .rung {
+    width: 44px;
+    display: flex;
+    justify-content: center;
+  }
+  .rung span {
+    width: 2px;
+    height: 12px;
+    background: #000000;
+    display: block;
+  }
+  .tile {
+    width: 44px;
+    height: 44px;
+    border: 2px solid #000000;
+    background: #ffffff;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 20px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .tile.template {
+    background: #f0f0f0;
+  }
+  .tile.slot {
+    background: #fafafa;
+    color: #bbbbbb;
+    cursor: pointer;
+  }
+  .tile.slot.solved {
+    background: #dbe8ff;
+    border-color: #0000ee;
+    color: #0000ee;
+    cursor: default;
+  }
+  .tile.slot.wrong {
+    background: #ffd9d9;
+    border-color: #cc0000;
+  }
+
+  #palette {
+    text-align: center;
+    margin-bottom: 6px;
+  }
+  #palette h3 {
+    font-size: 14px;
+    margin: 0 0 8px;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: normal;
+    border-bottom: 1px dashed #000000;
+    padding-bottom: 4px;
+  }
+  .base-btn {
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    width: 56px;
+    background: #d4d0c8;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    padding: 8px 0;
+    cursor: pointer;
+    margin: 0 4px;
+  }
+  .base-btn:active {
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+  }
+  .base-btn.armed {
+    background: #0000ee;
+    color: #ffffff;
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+  }
+
+  #statusbar {
+    margin-top: 18px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    border-top: 1px solid #000000;
+    padding-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  #statusbar .readout::after {
+    content: '_';
+    animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  #controls button {
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+    font-size: 12px;
+    background: #d4d0c8;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    padding: 5px 12px;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+  #controls button:active {
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+  }
+
+  #modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    align-items: center;
+    justify-content: center;
+  }
+  #modal-overlay.show { display: flex; }
+  #modal-box {
+    background: #d4d0c8;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    width: 300px;
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+  }
+  #modal-title {
+    background: #0000ee;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 8px;
+  }
+  #modal-body {
+    padding: 16px;
+    font-size: 13px;
+    text-align: center;
+  }
+  #modal-body button {
+    margin-top: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div id="exercise">
+  <span class="tag">BIO-02 :: EXERCISE</span>
+  <h2>DNA and the Genetic Code</h2>
+  <p class="instructions">&gt; Click a base below, then click the slot it pairs with to build the complementary strand.</p>
+  <div class="rule-box">PAIRING RULE &nbsp; A &lt;=&gt; T &nbsp;&nbsp;&nbsp; G &lt;=&gt; C</div>
+
+  <div id="ladder">
+    <div class="base-row" id="templateRow"></div>
+    <div class="rung-row" id="rungRow"></div>
+    <div class="base-row" id="slotRow"></div>
+  </div>
+
+  <div id="palette">
+    <h3>&gt; BASE PALETTE</h3>
+    <button class="base-btn" data-base="A">A</button>
+    <button class="base-btn" data-base="T">T</button>
+    <button class="base-btn" data-base="G">G</button>
+    <button class="base-btn" data-base="C">C</button>
+  </div>
+
+  <div id="statusbar">
+    <div class="readout" id="readout">PAIRED: 0/8&nbsp;&nbsp;&nbsp;MISTAKES: 0</div>
+    <div id="controls">
+      <button id="newRoundBtn">New Round</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-overlay">
+  <div id="modal-box">
+    <div id="modal-title">BIOHELIX.EXE</div>
+    <div id="modal-body">
+      <div>SEQUENCE COMPLETE.<br>STRAND SYNTHESIZED.</div>
+      <button id="modalOkBtn">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var BASES = ['A', 'T', 'G', 'C'];
+  var COMPLEMENT = { A: 'T', T: 'A', G: 'C', C: 'G' };
+  var LENGTH = 8;
+
+  var templateRow = document.getElementById('templateRow');
+  var rungRow = document.getElementById('rungRow');
+  var slotRow = document.getElementById('slotRow');
+  var readout = document.getElementById('readout');
+  var paletteBtns = Array.prototype.slice.call(document.querySelectorAll('.base-btn'));
+
+  var template = [];
+  var armedBase = null;
+  var matched = 0;
+  var mistakes = 0;
+
+  function randomTemplate() {
+    var seq = [];
+    for (var i = 0; i < LENGTH; i++) {
+      seq.push(BASES[Math.floor(Math.random() * BASES.length)]);
+    }
+    return seq;
+  }
+
+  function updateReadout() {
+    readout.innerHTML = 'PAIRED: ' + matched + '/' + LENGTH + '&nbsp;&nbsp;&nbsp;MISTAKES: ' + mistakes;
+  }
+
+  function buildLadder() {
+    template = randomTemplate();
+    templateRow.innerHTML = '';
+    rungRow.innerHTML = '';
+    slotRow.innerHTML = '';
+
+    template.forEach(function (base, i) {
+      var t = document.createElement('div');
+      t.className = 'tile template';
+      t.textContent = base;
+      templateRow.appendChild(t);
+
+      var r = document.createElement('div');
+      r.className = 'rung';
+      r.innerHTML = '<span></span>';
+      rungRow.appendChild(r);
+
+      var s = document.createElement('div');
+      s.className = 'tile slot';
+      s.textContent = '?';
+      s.dataset.answer = COMPLEMENT[base];
+      s.dataset.index = i;
+      s.addEventListener('click', onSlotClick);
+      slotRow.appendChild(s);
+    });
+  }
+
+  function onSlotClick(e) {
+    var slot = e.currentTarget;
+    if (slot.classList.contains('solved') || !armedBase) return;
+    if (armedBase === slot.dataset.answer) {
+      slot.classList.add('solved');
+      slot.textContent = armedBase;
+      matched += 1;
+      armedBase = null;
+      paletteBtns.forEach(function (b) { b.classList.remove('armed'); });
+      updateReadout();
+      if (matched === LENGTH) {
+        document.getElementById('modal-overlay').classList.add('show');
+      }
+    } else {
+      mistakes += 1;
+      slot.classList.add('wrong');
+      setTimeout(function () { slot.classList.remove('wrong'); }, 500);
+      armedBase = null;
+      paletteBtns.forEach(function (b) { b.classList.remove('armed'); });
+      updateReadout();
+    }
+  }
+
+  paletteBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      paletteBtns.forEach(function (b) { b.classList.remove('armed'); });
+      armedBase = btn.dataset.base;
+      btn.classList.add('armed');
+    });
+  });
+
+  document.getElementById('newRoundBtn').addEventListener('click', function () {
+    matched = 0;
+    mistakes = 0;
+    armedBase = null;
+    paletteBtns.forEach(function (b) { b.classList.remove('armed'); });
+    document.getElementById('modal-overlay').classList.remove('show');
+    buildLadder();
+    updateReadout();
+  });
+
+  document.getElementById('modalOkBtn').addEventListener('click', function () {
+    document.getElementById('modal-overlay').classList.remove('show');
+  });
+
+  buildLadder();
+  updateReadout();
+})();
+</script>
+
+</body>
+</html>

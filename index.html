@@ -375,6 +375,8 @@ function entryRow(t) {
   var noteHtml = '[ interactive exercise for this topic is planned but not yet built ]';
   if (t.id === "BIO-01") {
     noteHtml = '<a href="cell-structure-exercise-v2.html">[ open interactive exercise for this topic ]</a>';
+  } else if (t.id === "BIO-02") {
+    noteHtml = '<a href="dna-genetic-code-exercise.html">[ open interactive exercise for this topic ]</a>';
   }
   var titleAttr = escAttr(t.title.toLowerCase());
   var blurbAttr = escAttr(t.blurb.toLowerCase());

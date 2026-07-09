@@ -171,6 +171,12 @@
     background: #f7f7f7;
     border-right: 1px solid #cccccc;
   }
+  .entry-id-preview {
+    display: block;
+    width: 56px;
+    height: auto;
+    margin-top: 8px;
+  }
   table.entry h3 {
     margin: 0 0 6px;
     font-size: 16px;
@@ -406,6 +412,10 @@ function entryRow(t) {
   } else if (t.id === "BIO-06") {
     noteHtml = '<a href="ecosystems-food-webs-exercise.html">[ open interactive exercise for this topic ]</a>';
   }
+  var idHtml = t.id;
+  if (t.id === "BIO-06") {
+    idHtml += '<img class="entry-id-preview" src="frog-icon.png" alt="Frog icon preview for BIO-06 exercise">';
+  }
   var titleAttr = escAttr(t.title.toLowerCase());
   var blurbAttr = escAttr(t.blurb.toLowerCase());
   var tagsAttr = escAttr(t.tags.join(" ").toLowerCase());
@@ -413,7 +423,7 @@ function entryRow(t) {
   return (
     '<table class="entry" id="' + t.id + '" data-title="' + titleAttr + '" data-blurb="' + blurbAttr + '" data-tags="' + tagsAttr + '">' +
       "<tr>" +
-        '<td class="entry-id">' + t.id + "</td>" +
+        '<td class="entry-id">' + idHtml + "</td>" +
         "<td>" +
           "<h3>" + t.title + "</h3>" +
           "<p>" + t.blurb + "</p>" +

@@ -413,7 +413,9 @@ function entryRow(t) {
     noteHtml = '<a href="ecosystems-food-webs-exercise.html">[ open interactive exercise for this topic ]</a>';
   }
   var idHtml = t.id;
-  if (t.id === "BIO-06") {
+  if (t.id === "BIO-05") {
+    idHtml += '<img class="entry-id-preview" src="virus-icon.png" alt="Virus icon preview for BIO-05 exercise">';
+  } else if (t.id === "BIO-06") {
     idHtml += '<img class="entry-id-preview" src="frog-icon.png" alt="Frog icon preview for BIO-06 exercise">';
   }
   var titleAttr = escAttr(t.title.toLowerCase());

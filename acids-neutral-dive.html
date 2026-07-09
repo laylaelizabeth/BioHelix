@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BONUS-02 :: Acids and Bases -- Interactive Exercise</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 20px;
+    background: #ffffff;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    color: #000000;
+  }
+  #exercise {
+    max-width: 640px;
+    margin: 0 auto;
+    border: 2px solid #000000;
+    padding: 16px 20px 20px;
+  }
+  .tag {
+    display: inline-block;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    background: #f0f0f0;
+    border: 1px solid #000000;
+    padding: 2px 8px;
+    margin-bottom: 8px;
+  }
+  h2 { font-size: 22px; margin: 4px 0 4px; }
+  .instructions {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12.5px;
+    margin: 0 0 14px;
+    color: #333333;
+    line-height: 1.5;
+  }
+
+  #bar-wrap {
+    border: 1px solid #000000;
+    background: #fafafa;
+    padding: 10px 12px 6px;
+    margin-bottom: 6px;
+  }
+  #bar-wrap svg { width: 100%; height: auto; display: block; }
+  .scale-labels {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 11px;
+    color: #444444;
+    padding: 0 2px;
+    margin-bottom: 14px;
+  }
+
+  #pool-wrap {
+    border: 1px solid #000000;
+    background: #f5fbff;
+    padding: 6px;
+    margin-bottom: 14px;
+  }
+  #pool-wrap svg { width: 100%; height: auto; display: block; }
+
+  #feedback {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    min-height: 18px;
+    margin-bottom: 10px;
+    color: #0000ee;
+    font-weight: bold;
+  }
+
+  #jumpBtn {
+    display: block;
+    width: 100%;
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    background: #d4d0c8;
+    border-top: 3px solid #ffffff;
+    border-left: 3px solid #ffffff;
+    border-right: 3px solid #404040;
+    border-bottom: 3px solid #404040;
+    padding: 12px;
+    cursor: pointer;
+    margin-bottom: 14px;
+  }
+  #jumpBtn:active {
+    border-top: 3px solid #404040;
+    border-left: 3px solid #404040;
+    border-right: 3px solid #ffffff;
+    border-bottom: 3px solid #ffffff;
+  }
+  #jumpBtn:disabled { color: #999999; cursor: default; }
+
+  #statusbar {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    border-top: 1px solid #000000;
+    padding-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  #statusbar .readout::after {
+    content: '_';
+    animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  #controls button {
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+    font-size: 12px;
+    background: #d4d0c8;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    padding: 5px 12px;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+  #controls button:active {
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+  }
+
+  #modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    align-items: center;
+    justify-content: center;
+  }
+  #modal-overlay.show { display: flex; }
+  #modal-box {
+    background: #d4d0c8;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    width: 300px;
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+  }
+  #modal-title {
+    background: #0000ee;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 8px;
+  }
+  #modal-body { padding: 16px; font-size: 13px; text-align: center; }
+  #modal-body button { margin-top: 12px; }
+</style>
+</head>
+<body>
+
+<div id="exercise">
+  <span class="tag">BONUS-02 :: EXERCISE</span>
+  <h2>Acids and Bases: Neutral Dive</h2>
+  <p class="instructions">&gt; The needle sweeps across the pH scale. Click JUMP only when it sits in the
+  Neutral zone (pH 6.5-7.5) so the diver lands in safe water. Jumping into acidic
+  or basic water ends the run.</p>
+
+  <div id="bar-wrap">
+    <svg id="phbar" viewBox="0 0 500 66" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="phGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"  stop-color="#c62828"/>
+          <stop offset="20%" stop-color="#e65100"/>
+          <stop offset="35%" stop-color="#f9a825"/>
+          <stop offset="46%" stop-color="#c0ca33"/>
+          <stop offset="50%" stop-color="#43a047"/>
+          <stop offset="54%" stop-color="#26a69a"/>
+          <stop offset="65%" stop-color="#1e88e5"/>
+          <stop offset="80%" stop-color="#3949ab"/>
+          <stop offset="100%" stop-color="#8e24aa"/>
+        </linearGradient>
+      </defs>
+      <rect x="0" y="10" width="500" height="30" fill="url(#phGrad)" stroke="#000000" stroke-width="2"/>
+      <rect id="neutralZone" x="232" y="10" width="36" height="30" fill="none" stroke="#000000" stroke-width="2" stroke-dasharray="4,3"/>
+      <g id="pointer" transform="translate(0,0)">
+        <polygon points="0,2 -7,-8 7,-8" fill="#000000"/>
+        <line x1="0" y1="2" x2="0" y2="42" stroke="#000000" stroke-width="2.5"/>
+      </g>
+    </svg>
+  </div>
+  <div class="scale-labels">
+    <span>0 -- ACIDIC</span>
+    <span>7 -- NEUTRAL</span>
+    <span>14 -- BASIC</span>
+  </div>
+
+  <div id="pool-wrap">
+    <svg id="poolScene" viewBox="0 0 500 160" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="500" height="160" fill="#f5fbff"/>
+      <rect x="20" y="105" width="460" height="40" rx="6" fill="#8fd3f4" stroke="#000000" stroke-width="2"/>
+      <path id="ripple1" d="M40,115 Q55,110 70,115 T100,115 T130,115" fill="none" stroke="#3a8fc0" stroke-width="1.5"/>
+      <path id="ripple2" d="M300,122 Q315,117 330,122 T360,122 T390,122" fill="none" stroke="#3a8fc0" stroke-width="1.5"/>
+
+      <rect x="18" y="60" width="70" height="8" fill="#8a5a2b" stroke="#000000" stroke-width="2"/>
+      <rect x="18" y="68" width="8" height="37" fill="#8a5a2b" stroke="#000000" stroke-width="2"/>
+
+      <g id="diver" transform="translate(52,50)">
+        <circle cx="0" cy="-14" r="8" fill="#f2c79c" stroke="#000000" stroke-width="1.5"/>
+        <path d="M0,-6 L0,10" stroke="#000000" stroke-width="3" stroke-linecap="round"/>
+        <path d="M0,-2 L-11,-8" stroke="#000000" stroke-width="3" stroke-linecap="round"/>
+        <path d="M0,-2 L11,-8" stroke="#000000" stroke-width="3" stroke-linecap="round"/>
+        <path d="M0,10 L-8,22" stroke="#000000" stroke-width="3" stroke-linecap="round"/>
+        <path d="M0,10 L8,22" stroke="#000000" stroke-width="3" stroke-linecap="round"/>
+        <g id="faceOk">
+          <circle cx="-3" cy="-15" r="1.2" fill="#000000"/>
+          <circle cx="3" cy="-15" r="1.2" fill="#000000"/>
+        </g>
+        <g id="faceBad" style="display:none">
+          <path d="M-5,-18 L-1,-14 M-1,-18 L-5,-14" stroke="#000000" stroke-width="1.3"/>
+          <path d="M1,-18 L5,-14 M5,-18 L1,-14" stroke="#000000" stroke-width="1.3"/>
+        </g>
+      </g>
+    </svg>
+  </div>
+
+  <div id="feedback">&nbsp;</div>
+
+  <button id="jumpBtn" type="button">JUMP</button>
+
+  <div id="statusbar">
+    <div class="readout" id="readout">SUCCESSFUL JUMPS: 0&nbsp;&nbsp;&nbsp;BEST STREAK: 0</div>
+    <div id="controls">
+      <button id="restartBtn">Restart</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-overlay">
+  <div id="modal-box">
+    <div id="modal-title">BIOHELIX.EXE</div>
+    <div id="modal-body">
+      <div id="modalMsg">SPLASH!</div>
+      <button id="modalOkBtn">Restart</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var BAR_WIDTH = 500;
+  var NEUTRAL_MIN_PH = 6.5;
+  var NEUTRAL_MAX_PH = 7.5;
+  var INITIAL_DURATION_MS = 1900;
+  var MIN_DURATION_MS = 650;
+  var API_BASE = 'https://biohelix-production.up.railway.app';
+  var GAME_KEY = 'acids-neutral-dive';
+
+  var pointerEl = document.getElementById('pointer');
+  var diverEl = document.getElementById('diver');
+  var faceOk = document.getElementById('faceOk');
+  var faceBad = document.getElementById('faceBad');
+  var feedbackEl = document.getElementById('feedback');
+  var readout = document.getElementById('readout');
+  var jumpBtn = document.getElementById('jumpBtn');
+  var modalOverlay = document.getElementById('modal-overlay');
+  var modalMsg = document.getElementById('modalMsg');
+
+  var t = 0;              // 0..1 fraction across the bar
+  var direction = 1;
+  var durationMs = INITIAL_DURATION_MS;
+  var lastFrameTime = null;
+  var rafId = null;
+  var running = true;
+  var jumps = 0;
+  var bestStreak = 0;
+  var bestLoaded = false;
+  var streak = 0;
+
+  function currentPH() {
+    return t * 14;
+  }
+
+  function zoneFor(ph) {
+    if (ph >= NEUTRAL_MIN_PH && ph <= NEUTRAL_MAX_PH) return 'neutral';
+    return ph < NEUTRAL_MIN_PH ? 'acidic' : 'basic';
+  }
+
+  function renderPointer() {
+    var x = t * BAR_WIDTH;
+    pointerEl.setAttribute('transform', 'translate(' + x + ',0)');
+  }
+
+  function updateReadout() {
+    readout.innerHTML = 'SUCCESSFUL JUMPS: ' + jumps + '&nbsp;&nbsp;&nbsp;BEST STREAK: ' + bestStreak;
+    if (!bestLoaded) {
+      readout.innerHTML += '&nbsp;&nbsp;&nbsp;(SYNCING...)';
+    }
+  }
+
+  function fetchBestScore() {
+    return fetch(API_BASE + '/api/highscore?game=' + encodeURIComponent(GAME_KEY))
+      .then(function (response) {
+        if (!response.ok) throw new Error('Could not load best score.');
+        return response.json();
+      })
+      .then(function (data) {
+        if (typeof data.best === 'number' && data.best > bestStreak) {
+          bestStreak = data.best;
+        }
+        bestLoaded = true;
+        updateReadout();
+      })
+      .catch(function () {
+        bestLoaded = true;
+        updateReadout();
+      });
+  }
+
+  function submitBestScore(score) {
+    return fetch(API_BASE + '/api/highscore', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ game: GAME_KEY, score: score })
+    })
+      .then(function (response) {
+        if (!response.ok) throw new Error('Could not save best score.');
+        return response.json();
+      })
+      .then(function (data) {
+        if (typeof data.best === 'number' && data.best !== bestStreak) {
+          bestStreak = data.best;
+          updateReadout();
+        }
+      })
+      .catch(function () {});
+  }
+
+  function step(now) {
+    if (!running) return;
+    if (lastFrameTime === null) lastFrameTime = now;
+    var delta = now - lastFrameTime;
+    lastFrameTime = now;
+
+    t += direction * (delta / durationMs);
+    if (t >= 1) { t = 1; direction = -1; }
+    if (t <= 0) { t = 0; direction = 1; }
+
+    renderPointer();
+    rafId = requestAnimationFrame(step);
+  }
+
+  function startLoop() {
+    lastFrameTime = null;
+    running = true;
+    rafId = requestAnimationFrame(step);
+  }
+
+  function stopLoop() {
+    running = false;
+    if (rafId) cancelAnimationFrame(rafId);
+  }
+
+  function showFeedback(text) {
+    feedbackEl.textContent = text;
+  }
+
+  function onJump() {
+    if (!running) return;
+    var ph = currentPH();
+    var zone = zoneFor(ph);
+
+    if (zone === 'neutral') {
+      jumps += 1;
+      streak += 1;
+      if (streak > bestStreak) {
+        bestStreak = streak;
+        submitBestScore(streak);
+      }
+      updateReadout();
+      showFeedback('NICE DIVE! pH ' + ph.toFixed(1) + ' -- PERFECTLY NEUTRAL.');
+      durationMs = Math.max(MIN_DURATION_MS, durationMs * 0.9);
+    } else {
+      streak = 0;
+      stopLoop();
+      jumpBtn.disabled = true;
+      faceOk.style.display = 'none';
+      faceBad.style.display = '';
+      var label = zone === 'acidic' ? 'ACIDIC' : 'BASIC';
+      modalMsg.innerHTML = 'SPLASH! THAT WATER WAS ' + label + ' (pH ' + ph.toFixed(1) + ').<br>YOU MUST RESTART.';
+      modalOverlay.classList.add('show');
+    }
+  }
+
+  function restart() {
+    t = 0;
+    direction = 1;
+    durationMs = INITIAL_DURATION_MS;
+    jumps = 0;
+    streak = 0;
+    jumpBtn.disabled = false;
+    faceOk.style.display = '';
+    faceBad.style.display = 'none';
+    showFeedback('');
+    updateReadout();
+    modalOverlay.classList.remove('show');
+    renderPointer();
+    startLoop();
+  }
+
+  jumpBtn.addEventListener('click', onJump);
+  document.getElementById('restartBtn').addEventListener('click', restart);
+  document.getElementById('modalOkBtn').addEventListener('click', restart);
+
+  // test-only hooks (harmless for normal play; used for automated verification)
+  window.__phGameDebug = {
+    setFraction: function (v) { t = v; renderPointer(); },
+    getPH: function () { return currentPH(); },
+    getZone: function () { return zoneFor(currentPH()); },
+    isRunning: function () { return running; }
+  };
+
+  updateReadout();
+  renderPointer();
+  startLoop();
+  fetchBestScore();
+})();
+</script>
+
+</body>
+</html>

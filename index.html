@@ -372,6 +372,10 @@ function entryRow(t) {
     linksHtml += '<a href="' + t.links[i].url + '" target="_blank" rel="noopener">' + t.links[i].label + "</a>";
     if (i < t.links.length - 1) linksHtml += " &nbsp;|&nbsp; ";
   }
+  var noteHtml = '[ interactive exercise for this topic is planned but not yet built ]';
+  if (t.id === "BIO-01") {
+    noteHtml = '<a href="cell-structure-exercise-v2.html">[ open interactive exercise for this topic ]</a>';
+  }
   var titleAttr = escAttr(t.title.toLowerCase());
   var blurbAttr = escAttr(t.blurb.toLowerCase());
   var tagsAttr = escAttr(t.tags.join(" ").toLowerCase());
@@ -383,7 +387,7 @@ function entryRow(t) {
         "<td>" +
           "<h3>" + t.title + "</h3>" +
           "<p>" + t.blurb + "</p>" +
-          '<div class="interactive-note">[ interactive exercise for this topic is planned but not yet built ]</div>' +
+          '<div class="interactive-note">' + noteHtml + "</div>" +
           '<div class="see-also"><b>See also:</b> ' + linksHtml + "</div>" +
         "</td>" +
       "</tr>" +

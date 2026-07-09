@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BIO-01 :: Cell Structure and Organelles -- Interactive Exercise</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 20px;
+    background: #ffffff;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    color: #000000;
+  }
+  #exercise {
+    max-width: 720px;
+    margin: 0 auto;
+    border: 2px solid #000000;
+    padding: 16px 20px 20px;
+  }
+  .tag {
+    display: inline-block;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    background: #f0f0f0;
+    border: 1px solid #000000;
+    padding: 2px 8px;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 22px;
+    margin: 4px 0 4px;
+  }
+  .instructions {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    margin: 0 0 14px;
+    color: #333333;
+  }
+  #stage {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  #diagram-wrap {
+    flex: 1 1 340px;
+    border: 1px solid #000000;
+    background: #fafafa;
+    padding: 6px;
+  }
+  #diagram-wrap svg { width: 100%; height: auto; display: block; }
+
+  .pin {
+    cursor: pointer;
+  }
+  .pin circle.dot {
+    fill: #ffffff;
+    stroke: #000000;
+    stroke-width: 2;
+  }
+  .pin text.num {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    font-weight: bold;
+    fill: #000000;
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+  .pin.solved circle.dot {
+    fill: #dbe8ff;
+    stroke: #0000ee;
+  }
+  .pin.solved text.num {
+    display: none;
+  }
+  .pin.solved text.label {
+    font-family: Georgia, serif;
+    font-size: 11px;
+    font-weight: bold;
+    fill: #0000ee;
+    text-anchor: middle;
+  }
+  .pin.wrong circle.dot {
+    fill: #ffd9d9;
+    stroke: #cc0000;
+  }
+
+  #wordbank {
+    flex: 1 1 220px;
+    min-width: 200px;
+  }
+  #wordbank h3 {
+    font-size: 14px;
+    margin: 0 0 8px;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: normal;
+    border-bottom: 1px dashed #000000;
+    padding-bottom: 4px;
+  }
+  .word-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    margin-bottom: 8px;
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+    font-size: 13px;
+    background: #d4d0c8;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    padding: 7px 10px;
+    cursor: pointer;
+  }
+  .word-btn:active {
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+  }
+  .word-btn.armed {
+    background: #0000ee;
+    color: #ffffff;
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+  }
+  .word-btn.used {
+    background: #f0f0f0;
+    color: #999999;
+    text-decoration: line-through;
+    cursor: default;
+    border: 1px solid #cccccc;
+  }
+
+  #statusbar {
+    margin-top: 16px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    border-top: 1px solid #000000;
+    padding-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  #statusbar .readout::after {
+    content: '_';
+    animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  #controls button {
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+    font-size: 12px;
+    background: #d4d0c8;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    padding: 5px 12px;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+  #controls button:active {
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+  }
+
+  #modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    align-items: center;
+    justify-content: center;
+  }
+  #modal-overlay.show { display: flex; }
+  #modal-box {
+    background: #d4d0c8;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    width: 300px;
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+  }
+  #modal-title {
+    background: #0000ee;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 8px;
+  }
+  #modal-body {
+    padding: 16px;
+    font-size: 13px;
+    text-align: center;
+  }
+  #modal-body button {
+    margin-top: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div id="exercise">
+  <span class="tag">BIO-01 :: EXERCISE</span>
+  <h2>Cell Structure and Organelles</h2>
+  <p class="instructions">&gt; Click a term in the list, then click the matching number on the diagram.</p>
+
+  <div id="stage">
+    <div id="diagram-wrap">
+      <svg viewBox="0 0 400 320" xmlns="http://www.w3.org/2000/svg">
+        <!-- cell membrane -->
+        <ellipse cx="200" cy="170" rx="178" ry="138" fill="#f5f5f5" stroke="#000000" stroke-width="3"/>
+
+        <!-- rough ER (squiggle) -->
+        <path d="M195,95 C185,85 205,80 195,70 C185,60 205,55 198,46"
+              fill="none" stroke="#555555" stroke-width="2"/>
+        <path d="M225,100 C215,90 235,85 225,75 C215,65 235,60 228,50"
+              fill="none" stroke="#555555" stroke-width="2"/>
+        <path d="M245,112 C235,102 255,97 245,87 C235,77 255,72 248,62"
+              fill="none" stroke="#555555" stroke-width="2"/>
+        <circle cx="196" cy="90" r="2.5" fill="#555555"/>
+        <circle cx="207" cy="72" r="2.5" fill="#555555"/>
+        <circle cx="226" cy="95" r="2.5" fill="#555555"/>
+        <circle cx="237" cy="77" r="2.5" fill="#555555"/>
+        <circle cx="246" cy="107" r="2.5" fill="#555555"/>
+
+        <!-- free ribosome dots -->
+        <circle cx="95" cy="185" r="2.5" fill="#333333"/>
+        <circle cx="105" cy="195" r="2.5" fill="#333333"/>
+        <circle cx="90" cy="200" r="2.5" fill="#333333"/>
+        <circle cx="108" cy="178" r="2.5" fill="#333333"/>
+        <circle cx="115" cy="200" r="2.5" fill="#333333"/>
+
+        <!-- mitochondria -->
+        <g transform="translate(280,110) rotate(-20)">
+          <ellipse rx="32" ry="17" fill="#f9e6e6" stroke="#000000" stroke-width="2"/>
+          <path d="M-18,0 C-14,-9 -6,-9 -2,0 C2,9 10,9 14,0" fill="none" stroke="#000000" stroke-width="1.5"/>
+        </g>
+        <g transform="translate(265,225) rotate(15)">
+          <ellipse rx="30" ry="16" fill="#f9e6e6" stroke="#000000" stroke-width="2"/>
+          <path d="M-17,0 C-13,-8 -5,-8 -1,0 C3,8 11,8 15,0" fill="none" stroke="#000000" stroke-width="1.5"/>
+        </g>
+
+        <!-- nucleus -->
+        <circle cx="150" cy="160" r="55" fill="#dfe7f5" stroke="#000000" stroke-width="2"/>
+        <circle cx="150" cy="160" r="17" fill="#b9c8e8" stroke="#000000" stroke-width="1.5"/>
+
+        <!-- numbered pins -->
+        <g class="pin" data-answer="nucleus" transform="translate(150,160)">
+          <circle class="dot" r="13"/>
+          <text class="num" y="1">1</text>
+          <text class="label" y="4" style="display:none">Nucleus</text>
+        </g>
+        <g class="pin" data-answer="mitochondria" transform="translate(280,110)">
+          <circle class="dot" r="13"/>
+          <text class="num" y="1">2</text>
+          <text class="label" y="4" style="display:none">Mitochondria</text>
+        </g>
+        <g class="pin" data-answer="membrane" transform="translate(200,33)">
+          <circle class="dot" r="13"/>
+          <text class="num" y="1">3</text>
+          <text class="label" y="4" style="display:none">Cell Membrane</text>
+        </g>
+        <g class="pin" data-answer="er" transform="translate(222,68)">
+          <circle class="dot" r="13"/>
+          <text class="num" y="1">4</text>
+          <text class="label" y="4" style="display:none">Endoplasmic Reticulum</text>
+        </g>
+        <g class="pin" data-answer="ribosomes" transform="translate(80,208)">
+          <circle class="dot" r="13"/>
+          <text class="num" y="1">5</text>
+          <text class="label" y="4" style="display:none">Ribosomes</text>
+        </g>
+        <g class="pin" data-answer="cytoplasm" transform="translate(90,255)">
+          <circle class="dot" r="13"/>
+          <text class="num" y="1">6</text>
+          <text class="label" y="4" style="display:none">Cytoplasm</text>
+        </g>
+      </svg>
+    </div>
+
+    <div id="wordbank">
+      <h3>&gt; TERM BANK</h3>
+      <div id="words"></div>
+    </div>
+  </div>
+
+  <div id="statusbar">
+    <div class="readout" id="readout">MATCHED: 0/6&nbsp;&nbsp;&nbsp;MISTAKES: 0</div>
+    <div id="controls">
+      <button id="newRoundBtn">New Round</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-overlay">
+  <div id="modal-box">
+    <div id="modal-title">BIOHELIX.EXE</div>
+    <div id="modal-body">
+      <div>ALL ORGANELLES IDENTIFIED.<br>WELL DONE.</div>
+      <button id="modalOkBtn">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var TERMS = [
+    { key: 'nucleus', label: 'Nucleus' },
+    { key: 'mitochondria', label: 'Mitochondria' },
+    { key: 'membrane', label: 'Cell Membrane' },
+    { key: 'er', label: 'Endoplasmic Reticulum' },
+    { key: 'ribosomes', label: 'Ribosomes' },
+    { key: 'cytoplasm', label: 'Cytoplasm' }
+  ];
+
+  var wordsEl = document.getElementById('words');
+  var readout = document.getElementById('readout');
+  var pins = Array.prototype.slice.call(document.querySelectorAll('.pin'));
+  var armedKey = null;
+  var matched = 0;
+  var mistakes = 0;
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  function renderWords() {
+    wordsEl.innerHTML = '';
+    shuffle(TERMS).forEach(function (t) {
+      var btn = document.createElement('button');
+      btn.className = 'word-btn';
+      btn.type = 'button';
+      btn.textContent = t.label;
+      btn.dataset.key = t.key;
+      btn.addEventListener('click', function () {
+        if (btn.classList.contains('used')) return;
+        document.querySelectorAll('.word-btn').forEach(function (b) { b.classList.remove('armed'); });
+        armedKey = t.key;
+        btn.classList.add('armed');
+      });
+      wordsEl.appendChild(btn);
+    });
+  }
+
+  function updateReadout() {
+    readout.innerHTML = 'MATCHED: ' + matched + '/6&nbsp;&nbsp;&nbsp;MISTAKES: ' + mistakes;
+  }
+
+  function disableWord(key) {
+    var btn = wordsEl.querySelector('[data-key="' + key + '"]');
+    if (btn) {
+      btn.classList.remove('armed');
+      btn.classList.add('used');
+    }
+  }
+
+  pins.forEach(function (pin) {
+    pin.addEventListener('click', function () {
+      if (pin.classList.contains('solved') || !armedKey) return;
+      var answer = pin.dataset.answer;
+      if (armedKey === answer) {
+        pin.classList.add('solved');
+        pin.querySelector('.label').style.display = '';
+        var term = TERMS.filter(function (t) { return t.key === answer; })[0];
+        pin.querySelector('.label').textContent = term.label;
+        disableWord(answer);
+        matched += 1;
+        armedKey = null;
+        updateReadout();
+        if (matched === 6) {
+          document.getElementById('modal-overlay').classList.add('show');
+        }
+      } else {
+        mistakes += 1;
+        pin.classList.add('wrong');
+        setTimeout(function () { pin.classList.remove('wrong'); }, 500);
+        armedKey = null;
+        document.querySelectorAll('.word-btn').forEach(function (b) { b.classList.remove('armed'); });
+        updateReadout();
+      }
+    });
+  });
+
+  document.getElementById('newRoundBtn').addEventListener('click', function () {
+    matched = 0;
+    mistakes = 0;
+    armedKey = null;
+    pins.forEach(function (pin) {
+      pin.classList.remove('solved', 'wrong');
+      pin.querySelector('.label').style.display = 'none';
+    });
+    document.getElementById('modal-overlay').classList.remove('show');
+    renderWords();
+    updateReadout();
+  });
+
+  document.getElementById('modalOkBtn').addEventListener('click', function () {
+    document.getElementById('modal-overlay').classList.remove('show');
+  });
+
+  renderWords();
+  updateReadout();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BONUS-04 :: Chemical Bonding -- Interactive Exercise</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 24px 12px;
+    background: #008080;
+    font-family: Tahoma, "MS Sans Serif", Geneva, sans-serif;
+    display: flex;
+    justify-content: center;
+  }
+
+  .page { width: 100%; max-width: 560px; }
+
+  .win98-window {
+    background: #c0c0c0;
+    border: 2px solid #dfdfdf;
+    border-right-color: #000;
+    border-bottom-color: #000;
+    box-shadow:
+      inset -1px -1px 0 #000,
+      inset 1px 1px 0 #fff,
+      2px 2px 6px rgba(0,0,0,0.4);
+  }
+
+  .title-bar {
+    background: linear-gradient(90deg, #000080, #1084d0 85%, #1084d0);
+    color: #fff;
+    font-weight: bold;
+    font-size: 13px;
+    padding: 3px 4px 3px 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    letter-spacing: 0.5px;
+  }
+
+  .title-bar-controls { display: flex; gap: 3px; }
+  .title-bar-controls button {
+    width: 18px; height: 16px;
+    background: #c0c0c0;
+    border: 1px solid #dfdfdf;
+    border-right-color: #000;
+    border-bottom-color: #000;
+    font-size: 11px;
+    line-height: 1;
+    font-weight: bold;
+    color: #000;
+    cursor: default;
+  }
+
+  .window-body { padding: 12px 16px 16px; }
+
+  .eyebrow { font-size: 11px; color: #000080; font-weight: bold; letter-spacing: 1px; }
+  h1 { font-size: 22px; margin: 2px 0 8px; color: #000; }
+  .blurb { font-size: 12px; line-height: 1.5; color: #202020; margin: 0 0 14px; }
+
+  .crt-screen {
+    background: #001a00;
+    border: 2px solid #808080;
+    box-shadow: inset 2px 2px 4px #000;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .crt-screen::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.05) 0px,
+      rgba(255,255,255,0.05) 1px,
+      transparent 2px,
+      transparent 3px
+    );
+    pointer-events: none;
+  }
+
+  .prompt-line {
+    font-family: "Courier New", monospace;
+    color: #33ff66;
+    text-shadow: 0 0 4px rgba(51,255,102,0.6);
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    min-height: 18px;
+    text-align: center;
+  }
+
+  .timer-track { margin-top: 8px; height: 8px; background: #002200; border: 1px solid #003300; }
+  .timer-fill { height: 100%; background: #33ff66; width: 100%; transition: width linear; }
+  .timer-fill.warn { background: #ffaa00; }
+  .timer-fill.danger { background: #ff3333; }
+
+  /* ---------- Atom duel ---------- */
+  .atom-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .atom-chip {
+    background: #000;
+    border: 3px solid #dfdfdf;
+    border-right-color: #000;
+    border-bottom-color: #000;
+    box-shadow: inset -1px -1px 0 rgba(255,255,255,0.15);
+    padding: 14px 18px;
+    font-family: "Courier New", monospace;
+    color: #33ff66;
+    text-align: center;
+    min-width: 90px;
+  }
+
+  .atom-chip .z { font-size: 10px; opacity: 0.75; }
+  .atom-chip .sym {
+    font-size: 32px;
+    font-weight: bold;
+    line-height: 1.1;
+    text-shadow: 0 0 6px rgba(51,255,102,0.7);
+  }
+  .atom-chip .nm { font-size: 10px; letter-spacing: 1px; margin-top: 2px; }
+
+  .bond-gap {
+    font-family: "Courier New", monospace;
+    font-size: 20px;
+    font-weight: bold;
+    color: #ffaa00;
+    text-shadow: 0 0 6px rgba(255,170,0,0.7);
+    animation: crackle 0.9s ease-in-out infinite;
+  }
+
+  @keyframes crackle {
+    0%, 100% { opacity: 0.5; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.15); }
+  }
+
+  /* ---------- Answer buttons ---------- */
+  .answer-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .answer-btn {
+    flex: 1;
+    background: #c0c0c0;
+    border: 2px solid #dfdfdf;
+    border-right-color: #000;
+    border-bottom-color: #000;
+    padding: 14px 4px;
+    font-family: Tahoma, "MS Sans Serif", sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+  }
+  .answer-btn:active { border-color: #000 #dfdfdf #dfdfdf #000; }
+  .answer-btn:disabled { cursor: default; opacity: 0.6; }
+
+  .answer-btn.correct-flash {
+    background: #2e7d32;
+    color: #fff;
+    border-color: #a5d6a7 #1b5e20 #1b5e20 #a5d6a7;
+  }
+  .answer-btn.wrong-flash {
+    background: #b71c1c;
+    color: #fff;
+    border-color: #ef9a9a #7f0000 #7f0000 #ef9a9a;
+  }
+
+  /* ---------- Stat readout ---------- */
+  .stat-readout {
+    font-family: "Courier New", monospace;
+    font-size: 12px;
+    background: #000;
+    color: #33ff66;
+    border: 2px solid #808080;
+    box-shadow: inset 1px 1px 3px #000;
+    padding: 8px 10px;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  .controls { display: flex; justify-content: flex-end; }
+
+  .win98-btn {
+    background: #c0c0c0;
+    border: 2px solid #dfdfdf;
+    border-right-color: #000;
+    border-bottom-color: #000;
+    padding: 5px 16px;
+    font-family: Tahoma, "MS Sans Serif", sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .win98-btn:active { border-color: #000 #dfdfdf #dfdfdf #000; }
+
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+    display: none; align-items: center; justify-content: center;
+    padding: 16px; z-index: 10;
+  }
+  .modal-overlay.open { display: flex; }
+  .dialog { width: 100%; max-width: 320px; }
+  .dialog-body { text-align: center; padding: 18px 14px 14px; }
+  .dialog-body p { font-size: 13px; line-height: 1.6; color: #000; margin: 0 0 14px; }
+  .dialog-body .win98-btn { padding: 5px 22px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="win98-window">
+    <div class="title-bar">
+      <span>BOND_BLITZ.EXE</span>
+      <div class="title-bar-controls">
+        <button aria-hidden="true">_</button>
+        <button aria-hidden="true">&#9633;</button>
+        <button aria-hidden="true">&times;</button>
+      </div>
+    </div>
+
+    <div class="window-body">
+      <div class="eyebrow">BONUS-04 :: EXERCISE</div>
+      <h1>Bond Blitz</h1>
+      <p class="blurb">
+        Two atoms are about to react. A <strong>metal + a nonmetal</strong> forms an
+        <strong>ionic</strong> bond (electrons transfer). <strong>Two nonmetals</strong> form a
+        <strong>covalent</strong> bond (electrons are shared). Call it before the meter drains &mdash;
+        three misses and the run ends.
+      </p>
+
+      <div class="crt-screen">
+        <div class="prompt-line" id="promptLine">IONIC OR COVALENT?</div>
+        <div class="timer-track"><div class="timer-fill" id="timerFill"></div></div>
+      </div>
+
+      <div class="atom-area">
+        <div class="atom-chip" id="atomA">
+          <div class="z">Z=?</div>
+          <div class="sym">--</div>
+          <div class="nm">-----</div>
+        </div>
+        <div class="bond-gap">&#8776;</div>
+        <div class="atom-chip" id="atomB">
+          <div class="z">Z=?</div>
+          <div class="sym">--</div>
+          <div class="nm">-----</div>
+        </div>
+      </div>
+
+      <div class="answer-row">
+        <button class="answer-btn" id="btnIonic" data-type="IONIC">IONIC</button>
+        <button class="answer-btn" id="btnCovalent" data-type="COVALENT">COVALENT</button>
+      </div>
+
+      <div class="stat-readout">
+        SCORE: <span id="scoreOut">0</span>&nbsp;&nbsp; STREAK: <span id="streakOut">0</span>&nbsp;&nbsp; BEST: <span id="bestOut">0</span>&nbsp;&nbsp; LIVES: <span id="livesOut">&#9679;&#9679;&#9679;</span>
+      </div>
+
+      <div class="controls">
+        <button class="win98-btn" id="restartBtn">Restart</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="win98-window dialog">
+      <div class="title-bar">
+        <span>BIOHELIX.EXE</span>
+        <div class="title-bar-controls"><button aria-hidden="true">&times;</button></div>
+      </div>
+      <div class="window-body dialog-body">
+        <p id="modalMessage">GAME OVER.<br>FINAL SCORE: 0</p>
+        <button class="win98-btn" id="modalOk">OK</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  // Common, familiar elements only -- no metalloids, no transition
+  // metals, no metal-metal pairs. Just metal vs. nonmetal.
+  var METALS = [
+    { sym:"Na", z:11, name:"SODIUM" },
+    { sym:"Mg", z:12, name:"MAGNESIUM" },
+    { sym:"K",  z:19, name:"POTASSIUM" },
+    { sym:"Ca", z:20, name:"CALCIUM" },
+    { sym:"Li", z:3,  name:"LITHIUM" },
+    { sym:"Al", z:13, name:"ALUMINUM" }
+  ];
+
+  var NONMETALS = [
+    { sym:"H",  z:1,  name:"HYDROGEN" },
+    { sym:"C",  z:6,  name:"CARBON" },
+    { sym:"N",  z:7,  name:"NITROGEN" },
+    { sym:"O",  z:8,  name:"OXYGEN" },
+    { sym:"F",  z:9,  name:"FLUORINE" },
+    { sym:"S",  z:16, name:"SULFUR" },
+    { sym:"Cl", z:17, name:"CHLORINE" },
+    { sym:"Br", z:35, name:"BROMINE" }
+  ];
+
+  var ROUND_MS = 7000;
+
+  var promptLine = document.getElementById("promptLine");
+  var timerFill = document.getElementById("timerFill");
+  var atomA = document.getElementById("atomA");
+  var atomB = document.getElementById("atomB");
+  var scoreOut = document.getElementById("scoreOut");
+  var streakOut = document.getElementById("streakOut");
+  var bestOut = document.getElementById("bestOut");
+  var livesOut = document.getElementById("livesOut");
+  var restartBtn = document.getElementById("restartBtn");
+  var modalOverlay = document.getElementById("modalOverlay");
+  var modalMessage = document.getElementById("modalMessage");
+  var modalOk = document.getElementById("modalOk");
+  var answerBtns = [
+    document.getElementById("btnIonic"),
+    document.getElementById("btnCovalent")
+  ];
+
+  var score, streak, best, lives, current, correctType, timerId, timerStart, locked;
+
+  function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
+
+  // Guarantee a clean, unambiguous pair every round:
+  // half the time metal+nonmetal (ionic), half the time two nonmetals (covalent).
+  function newPair() {
+    if (Math.random() < 0.5) {
+      return { a: pick(METALS), b: pick(NONMETALS), type: "IONIC" };
+    }
+    var a = pick(NONMETALS);
+    var b = pick(NONMETALS);
+    return { a: a, b: b, type: "COVALENT" };
+  }
+
+  function renderAtom(el, data) {
+    el.querySelector(".z").textContent = "Z=" + data.z;
+    el.querySelector(".sym").textContent = data.sym;
+    el.querySelector(".nm").textContent = data.name;
+  }
+
+  function updateStats() {
+    scoreOut.textContent = score;
+    streakOut.textContent = streak;
+    bestOut.textContent = best;
+    var full = "";
+    for (var i = 0; i < 3; i++) { full += i < lives ? "\u25CF" : "\u25CB"; }
+    livesOut.textContent = full;
+  }
+
+  function resetButtons() {
+    answerBtns.forEach(function (btn) {
+      btn.classList.remove("correct-flash", "wrong-flash");
+      btn.disabled = false;
+    });
+  }
+
+  function newRound() {
+    locked = false;
+    resetButtons();
+
+    var round = newPair();
+    current = { a: round.a, b: round.b };
+    correctType = round.type;
+
+    renderAtom(atomA, current.a);
+    renderAtom(atomB, current.b);
+    promptLine.textContent = "IONIC OR COVALENT?";
+
+    startTimer();
+  }
+
+  function startTimer() {
+    clearInterval(timerId);
+    timerStart = Date.now();
+    timerFill.style.transition = "none";
+    timerFill.style.width = "100%";
+    timerFill.classList.remove("warn", "danger");
+    void timerFill.offsetWidth;
+    timerFill.style.transition = "width " + ROUND_MS + "ms linear";
+    requestAnimationFrame(function () { timerFill.style.width = "0%"; });
+
+    timerId = setInterval(function () {
+      var elapsed = Date.now() - timerStart;
+      var remaining = ROUND_MS - elapsed;
+      if (remaining < ROUND_MS * 0.3) {
+        timerFill.classList.add("danger");
+      } else if (remaining < ROUND_MS * 0.6) {
+        timerFill.classList.add("warn");
+      }
+      if (elapsed >= ROUND_MS) {
+        clearInterval(timerId);
+        handleTimeout();
+      }
+    }, 100);
+  }
+
+  function correctBtn() {
+    return answerBtns.filter(function (b) { return b.dataset.type === correctType; })[0];
+  }
+
+  function handleTimeout() {
+    if (locked) return;
+    locked = true;
+    answerBtns.forEach(function (b) { b.disabled = true; });
+    correctBtn().classList.add("correct-flash");
+    missPenalty();
+  }
+
+  function handleAnswer(btn) {
+    if (locked) return;
+    locked = true;
+    clearInterval(timerId);
+    answerBtns.forEach(function (b) { b.disabled = true; });
+
+    if (btn.dataset.type === correctType) {
+      btn.classList.add("correct-flash");
+      score += 10;
+      streak += 1;
+      best = Math.max(best, streak);
+      updateStats();
+      setTimeout(newRound, 700);
+    } else {
+      btn.classList.add("wrong-flash");
+      correctBtn().classList.add("correct-flash");
+      missPenalty();
+    }
+  }
+
+  function missPenalty() {
+    streak = 0;
+    lives -= 1;
+    updateStats();
+    if (lives <= 0) {
+      setTimeout(gameOver, 800);
+    } else {
+      setTimeout(newRound, 900);
+    }
+  }
+
+  function gameOver() {
+    clearInterval(timerId);
+    modalMessage.innerHTML = "GAME OVER.<br>FINAL SCORE: " + score + " &mdash; BEST STREAK: " + best;
+    modalOverlay.classList.add("open");
+  }
+
+  function resetGame() {
+    score = 0;
+    streak = 0;
+    best = 0;
+    lives = 3;
+    modalOverlay.classList.remove("open");
+    updateStats();
+    newRound();
+  }
+
+  answerBtns.forEach(function (btn) {
+    btn.addEventListener("click", function () { handleAnswer(btn); });
+  });
+  restartBtn.addEventListener("click", resetGame);
+  modalOk.addEventListener("click", resetGame);
+
+  resetGame();
+})();
+</script>
+</body>
+</html>

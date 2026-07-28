@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BONUS-07 :: States of Matter and Phase Changes -- Interactive Exercise</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 24px 12px;
+    background: #008080;
+    font-family: Tahoma, "MS Sans Serif", Geneva, sans-serif;
+    display: flex;
+    justify-content: center;
+  }
+
+  .page { width: 100%; max-width: 560px; }
+
+  .win98-window {
+    background: #c0c0c0;
+    border: 2px solid #dfdfdf;
+    border-right-color: #000;
+    border-bottom-color: #000;
+    box-shadow:
+      inset -1px -1px 0 #000,
+      inset 1px 1px 0 #fff,
+      2px 2px 6px rgba(0,0,0,0.4);
+  }
+
+  .title-bar {
+    background: linear-gradient(90deg, #000080, #1084d0 85%, #1084d0);
+    color: #fff;
+    font-weight: bold;
+    font-size: 13px;
+    padding: 3px 4px 3px 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    letter-spacing: 0.5px;
+  }
+
+  .title-bar-controls { display: flex; gap: 3px; }
+  .title-bar-controls button {
+    width: 18px; height: 16px;
+    background: #c0c0c0;
+    border: 1px solid #dfdfdf;
+    border-right-color: #000;
+    border-bottom-color: #000;
+    font-size: 11px;
+    line-height: 1;
+    font-weight: bold;
+    color: #000;
+    cursor: default;
+  }
+
+  .window-body { padding: 12px 16px 16px; }
+
+  .eyebrow { font-size: 11px; color: #000080; font-weight: bold; letter-spacing: 1px; }
+  h1 { font-size: 22px; margin: 2px 0 8px; color: #000; }
+  .blurb { font-size: 12px; line-height: 1.5; color: #202020; margin: 0 0 14px; }
+
+  .crt-screen {
+    background: #001a00;
+    border: 2px solid #808080;
+    box-shadow: inset 2px 2px 4px #000;
+    padding: 10px 12px 8px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .crt-screen::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.05) 0px,
+      rgba(255,255,255,0.05) 1px,
+      transparent 2px,
+      transparent 3px
+    );
+    pointer-events: none;
+  }
+
+  .diagram-wrap { display: flex; justify-content: center; margin-bottom: 4px; }
+
+  .state-label {
+    font-family: "Courier New", monospace;
+    font-size: 9px;
+    fill: #4a8f63;
+    text-anchor: middle;
+  }
+
+  .diagram-arrow {
+    stroke: #33664a;
+    fill: #33664a;
+    transition: stroke 0.25s ease, fill 0.25s ease;
+  }
+  .diagram-arrow.reveal-endo { stroke: #ff8c1a; fill: #ff8c1a; }
+  .diagram-arrow.reveal-exo  { stroke: #3399ff; fill: #3399ff; }
+
+  .scenario-name {
+    font-family: "Courier New", monospace;
+    color: #33ff66;
+    text-shadow: 0 0 5px rgba(51,255,102,0.6);
+    font-size: 19px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-align: center;
+    margin-top: 2px;
+  }
+
+  .scenario-example {
+    font-family: "Courier New", monospace;
+    color: #9fdcb5;
+    font-size: 11px;
+    text-align: center;
+    min-height: 16px;
+    margin-bottom: 6px;
+    font-style: italic;
+  }
+
+  .question-line {
+    font-family: "Courier New", monospace;
+    color: #ffaa00;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .timer-track { margin-top: 4px; height: 8px; background: #002200; border: 1px solid #003300; }
+  .timer-fill { height: 100%; background: #33ff66; width: 100%; transition: width linear; }
+  .timer-fill.warn { background: #ffaa00; }
+  .timer-fill.danger { background: #ff3333; }
+
+  /* ---------- Answer buttons ---------- */
+  .answer-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .answer-btn {
+    flex: 1;
+    background: #c0c0c0;
+    border: 2px solid #dfdfdf;
+    border-right-color: #000;
+    border-bottom-color: #000;
+    padding: 14px 4px;
+    font-family: Tahoma, "MS Sans Serif", sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+  }
+  .answer-btn:active { border-color: #000 #dfdfdf #dfdfdf #000; }
+  .answer-btn:disabled { cursor: default; opacity: 0.6; }
+
+  .answer-btn.correct-flash {
+    background: #2e7d32;
+    color: #fff;
+    border-color: #a5d6a7 #1b5e20 #1b5e20 #a5d6a7;
+  }
+  .answer-btn.wrong-flash {
+    background: #b71c1c;
+    color: #fff;
+    border-color: #ef9a9a #7f0000 #7f0000 #ef9a9a;
+  }
+
+  /* ---------- Stat readout ---------- */
+  .stat-readout {
+    font-family: "Courier New", monospace;
+    font-size: 12px;
+    background: #000;
+    color: #33ff66;
+    border: 2px solid #808080;
+    box-shadow: inset 1px 1px 3px #000;
+    padding: 8px 10px;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  .controls { display: flex; justify-content: flex-end; }
+
+  .win98-btn {
+    background: #c0c0c0;
+    border: 2px solid #dfdfdf;
+    border-right-color: #000;
+    border-bottom-color: #000;
+    padding: 5px 16px;
+    font-family: Tahoma, "MS Sans Serif", sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .win98-btn:active { border-color: #000 #dfdfdf #dfdfdf #000; }
+
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+    display: none; align-items: center; justify-content: center;
+    padding: 16px; z-index: 10;
+  }
+  .modal-overlay.open { display: flex; }
+  .dialog { width: 100%; max-width: 320px; }
+  .dialog-body { text-align: center; padding: 18px 14px 14px; }
+  .dialog-body p { font-size: 13px; line-height: 1.6; color: #000; margin: 0 0 14px; }
+  .dialog-body .win98-btn { padding: 5px 22px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="win98-window">
+    <div class="title-bar">
+      <span>PHASE_FLIP.EXE</span>
+      <div class="title-bar-controls">
+        <button aria-hidden="true">_</button>
+        <button aria-hidden="true">&#9633;</button>
+        <button aria-hidden="true">&times;</button>
+      </div>
+    </div>
+
+    <div class="window-body">
+      <div class="eyebrow">BONUS-07 :: EXERCISE</div>
+      <h1>Phase Flip</h1>
+      <p class="blurb">
+        A phase change is named below. <strong>Call whether it's endothermic</strong> (absorbs energy)
+        <strong>or exothermic</strong> (releases energy) before the meter drains &mdash; three misses
+        and the run ends.
+      </p>
+
+      <div class="crt-screen">
+        <div class="diagram-wrap">
+          <svg width="280" height="110" viewBox="0 0 340 130">
+            <!-- static state icons -->
+            <rect x="46" y="46" width="28" height="28" rx="3" fill="none" stroke="#4a8f63" stroke-width="2"/>
+            <text x="60" y="110" class="state-label">SOLID</text>
+
+            <rect x="156" y="46" width="28" height="28" rx="3" fill="none" stroke="#4a8f63" stroke-width="2"/>
+            <path d="M156,58 q7,-6 14,0 q7,6 14,0" fill="none" stroke="#4a8f63" stroke-width="2"/>
+            <text x="170" y="110" class="state-label">LIQUID</text>
+
+            <circle cx="272" cy="52" r="3" fill="#4a8f63"/>
+            <circle cx="286" cy="60" r="3" fill="#4a8f63"/>
+            <circle cx="278" cy="70" r="3" fill="#4a8f63"/>
+            <text x="280" y="110" class="state-label">GAS</text>
+
+            <!-- arrow groups, one visible at a time -->
+            <g class="arrow-group" data-name="MELTING" style="display:none">
+              <line x1="84" y1="60" x2="146" y2="60" stroke-width="4" class="diagram-arrow"/>
+              <polygon points="146,60 136,55 136,65" class="diagram-arrow"/>
+            </g>
+            <g class="arrow-group" data-name="FREEZING" style="display:none">
+              <line x1="146" y1="60" x2="84" y2="60" stroke-width="4" class="diagram-arrow"/>
+              <polygon points="84,60 94,55 94,65" class="diagram-arrow"/>
+            </g>
+            <g class="arrow-group" data-name="VAPORIZATION" style="display:none">
+              <line x1="194" y1="60" x2="256" y2="60" stroke-width="4" class="diagram-arrow"/>
+              <polygon points="256,60 246,55 246,65" class="diagram-arrow"/>
+            </g>
+            <g class="arrow-group" data-name="CONDENSATION" style="display:none">
+              <line x1="256" y1="60" x2="194" y2="60" stroke-width="4" class="diagram-arrow"/>
+              <polygon points="194,60 204,55 204,65" class="diagram-arrow"/>
+            </g>
+            <g class="arrow-group" data-name="SUBLIMATION" style="display:none">
+              <path d="M60,40 Q170,0 280,40" fill="none" stroke-width="4" class="diagram-arrow"/>
+              <polygon points="280,40 269,33 271,44" class="diagram-arrow"/>
+            </g>
+            <g class="arrow-group" data-name="DEPOSITION" style="display:none">
+              <path d="M280,40 Q170,0 60,40" fill="none" stroke-width="4" class="diagram-arrow"/>
+              <polygon points="60,40 71,33 69,44" class="diagram-arrow"/>
+            </g>
+          </svg>
+        </div>
+
+        <div class="scenario-name" id="scenarioName">MELTING</div>
+        <div class="scenario-example" id="scenarioExample">e.g., an ice cube left on the counter</div>
+        <div class="question-line">ENDOTHERMIC OR EXOTHERMIC?</div>
+        <div class="timer-track"><div class="timer-fill" id="timerFill"></div></div>
+      </div>
+
+      <div class="answer-row">
+        <button class="answer-btn" id="btnEndo" data-type="ENDOTHERMIC">ENDOTHERMIC</button>
+        <button class="answer-btn" id="btnExo" data-type="EXOTHERMIC">EXOTHERMIC</button>
+      </div>
+
+      <div class="stat-readout">
+        SCORE: <span id="scoreOut">0</span>&nbsp;&nbsp; STREAK: <span id="streakOut">0</span>&nbsp;&nbsp; BEST: <span id="bestOut">0</span>&nbsp;&nbsp; LIVES: <span id="livesOut">&#9679;&#9679;&#9679;</span>
+      </div>
+
+      <div class="controls">
+        <button class="win98-btn" id="restartBtn">Restart</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="win98-window dialog">
+      <div class="title-bar">
+        <span>BIOHELIX.EXE</span>
+        <div class="title-bar-controls"><button aria-hidden="true">&times;</button></div>
+      </div>
+      <div class="window-body dialog-body">
+        <p id="modalMessage">GAME OVER.<br>FINAL SCORE: 0</p>
+        <button class="win98-btn" id="modalOk">OK</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  var TRANSITIONS = [
+    { name: "MELTING",       example: "e.g., an ice cube left on the counter",         answer: "ENDOTHERMIC" },
+    { name: "FREEZING",      example: "e.g., water left in the freezer overnight",     answer: "EXOTHERMIC" },
+    { name: "VAPORIZATION",  example: "e.g., a puddle drying up in the sun",           answer: "ENDOTHERMIC" },
+    { name: "CONDENSATION",  example: "e.g., fog forming on a cold window",            answer: "EXOTHERMIC" },
+    { name: "SUBLIMATION",   example: "e.g., dry ice fading away without melting",      answer: "ENDOTHERMIC" },
+    { name: "DEPOSITION",    example: "e.g., frost forming directly on cold grass",     answer: "EXOTHERMIC" }
+  ];
+
+  var ROUND_MS = 7000;
+
+  var scenarioName = document.getElementById("scenarioName");
+  var scenarioExample = document.getElementById("scenarioExample");
+  var timerFill = document.getElementById("timerFill");
+  var scoreOut = document.getElementById("scoreOut");
+  var streakOut = document.getElementById("streakOut");
+  var bestOut = document.getElementById("bestOut");
+  var livesOut = document.getElementById("livesOut");
+  var restartBtn = document.getElementById("restartBtn");
+  var modalOverlay = document.getElementById("modalOverlay");
+  var modalMessage = document.getElementById("modalMessage");
+  var modalOk = document.getElementById("modalOk");
+  var answerBtns = [
+    document.getElementById("btnEndo"),
+    document.getElementById("btnExo")
+  ];
+  var arrowGroups = Array.prototype.slice.call(document.querySelectorAll(".arrow-group"));
+
+  var score, streak, best, lives, current, timerId, timerStart, locked;
+
+  function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
+
+  function updateStats() {
+    scoreOut.textContent = score;
+    streakOut.textContent = streak;
+    bestOut.textContent = best;
+    var full = "";
+    for (var i = 0; i < 3; i++) { full += i < lives ? "\u25CF" : "\u25CB"; }
+    livesOut.textContent = full;
+  }
+
+  function resetButtons() {
+    answerBtns.forEach(function (btn) {
+      btn.classList.remove("correct-flash", "wrong-flash");
+      btn.disabled = false;
+    });
+  }
+
+  function showArrow(name) {
+    arrowGroups.forEach(function (g) {
+      g.classList.remove("reveal-endo", "reveal-exo");
+      g.style.display = (g.dataset.name === name) ? "inline" : "none";
+    });
+  }
+
+  function revealArrow(answer) {
+    var g = arrowGroups.filter(function (x) { return x.dataset.name === current.name; })[0];
+    if (!g) return;
+    g.classList.add(answer === "ENDOTHERMIC" ? "reveal-endo" : "reveal-exo");
+  }
+
+  function newRound() {
+    locked = false;
+    resetButtons();
+
+    current = pick(TRANSITIONS);
+    scenarioName.textContent = current.name;
+    scenarioExample.textContent = current.example;
+    showArrow(current.name);
+
+    startTimer();
+  }
+
+  function startTimer() {
+    clearInterval(timerId);
+    timerStart = Date.now();
+    timerFill.style.transition = "none";
+    timerFill.style.width = "100%";
+    timerFill.classList.remove("warn", "danger");
+    void timerFill.offsetWidth;
+    timerFill.style.transition = "width " + ROUND_MS + "ms linear";
+    requestAnimationFrame(function () { timerFill.style.width = "0%"; });
+
+    timerId = setInterval(function () {
+      var elapsed = Date.now() - timerStart;
+      var remaining = ROUND_MS - elapsed;
+      if (remaining < ROUND_MS * 0.3) {
+        timerFill.classList.add("danger");
+      } else if (remaining < ROUND_MS * 0.6) {
+        timerFill.classList.add("warn");
+      }
+      if (elapsed >= ROUND_MS) {
+        clearInterval(timerId);
+        handleTimeout();
+      }
+    }, 100);
+  }
+
+  function correctBtn() {
+    return answerBtns.filter(function (b) { return b.dataset.type === current.answer; })[0];
+  }
+
+  function handleTimeout() {
+    if (locked) return;
+    locked = true;
+    answerBtns.forEach(function (b) { b.disabled = true; });
+    correctBtn().classList.add("correct-flash");
+    revealArrow(current.answer);
+    missPenalty();
+  }
+
+  function handleAnswer(btn) {
+    if (locked) return;
+    locked = true;
+    clearInterval(timerId);
+    answerBtns.forEach(function (b) { b.disabled = true; });
+    revealArrow(current.answer);
+
+    if (btn.dataset.type === current.answer) {
+      btn.classList.add("correct-flash");
+      score += 10;
+      streak += 1;
+      best = Math.max(best, streak);
+      updateStats();
+      setTimeout(newRound, 800);
+    } else {
+      btn.classList.add("wrong-flash");
+      correctBtn().classList.add("correct-flash");
+      missPenalty();
+    }
+  }
+
+  function missPenalty() {
+    streak = 0;
+    lives -= 1;
+    updateStats();
+    if (lives <= 0) {
+      setTimeout(gameOver, 900);
+    } else {
+      setTimeout(newRound, 1000);
+    }
+  }
+
+  function gameOver() {
+    clearInterval(timerId);
+    modalMessage.innerHTML = "GAME OVER.<br>FINAL SCORE: " + score + " &mdash; BEST STREAK: " + best;
+    modalOverlay.classList.add("open");
+  }
+
+  function resetGame() {
+    score = 0;
+    streak = 0;
+    best = 0;
+    lives = 3;
+    modalOverlay.classList.remove("open");
+    updateStats();
+    newRound();
+  }
+
+  answerBtns.forEach(function (btn) {
+    btn.addEventListener("click", function () { handleAnswer(btn); });
+  });
+  restartBtn.addEventListener("click", resetGame);
+  modalOk.addEventListener("click", resetGame);
+
+  resetGame();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- orbit ring, consistent with the rest of the icon family -->
+  <circle cx="64" cy="64" r="42" fill="none" stroke="#4a4a4a" stroke-width="2" stroke-dasharray="4 4"/>
+
+  <!-- top arrow: forward reaction -->
+  <path d="M28,50 Q64,28 96,48" fill="none" stroke="#4F82C7" stroke-width="7" stroke-linecap="round"/>
+  <polygon points="96,48 86,43 87,53" fill="#4F82C7"/>
+  <circle cx="28" cy="50" r="7" fill="#4F82C7" stroke="#2b2b2b" stroke-width="1.5"/>
+
+  <!-- bottom arrow: reverse reaction -->
+  <path d="M100,80 Q64,102 32,80" fill="none" stroke="#E8615F" stroke-width="7" stroke-linecap="round"/>
+  <polygon points="32,80 42,75 41,85" fill="#E8615F"/>
+  <circle cx="100" cy="80" r="7" fill="#E8615F" stroke="#2b2b2b" stroke-width="1.5"/>
+</svg>

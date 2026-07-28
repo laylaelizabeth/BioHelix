@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BONUS-06 :: Reaction Rates and Equilibrium -- Interactive Exercise</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 24px 12px;
+    background: #008080;
+    font-family: Tahoma, "MS Sans Serif", Geneva, sans-serif;
+    display: flex;
+    justify-content: center;
+  }
+
+  .page { width: 100%; max-width: 560px; }
+
+  .win98-window {
+    background: #c0c0c0;
+    border: 2px solid #dfdfdf;
+    border-right-color: #000;
+    border-bottom-color: #000;
+    box-shadow:
+      inset -1px -1px 0 #000,
+      inset 1px 1px 0 #fff,
+      2px 2px 6px rgba(0,0,0,0.4);
+  }
+
+  .title-bar {
+    background: linear-gradient(90deg, #000080, #1084d0 85%, #1084d0);
+    color: #fff;
+    font-weight: bold;
+    font-size: 13px;
+    padding: 3px 4px 3px 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    letter-spacing: 0.5px;
+  }
+
+  .title-bar-controls { display: flex; gap: 3px; }
+  .title-bar-controls button {
+    width: 18px; height: 16px;
+    background: #c0c0c0;
+    border: 1px solid #dfdfdf;
+    border-right-color: #000;
+    border-bottom-color: #000;
+    font-size: 11px;
+    line-height: 1;
+    font-weight: bold;
+    color: #000;
+    cursor: default;
+  }
+
+  .window-body { padding: 12px 16px 16px; }
+
+  .eyebrow { font-size: 11px; color: #000080; font-weight: bold; letter-spacing: 1px; }
+  h1 { font-size: 22px; margin: 2px 0 8px; color: #000; }
+  .blurb { font-size: 12px; line-height: 1.5; color: #202020; margin: 0 0 14px; }
+
+  .crt-screen {
+    background: #001a00;
+    border: 2px solid #808080;
+    box-shadow: inset 2px 2px 4px #000;
+    padding: 12px 12px 10px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .crt-screen::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.05) 0px,
+      rgba(255,255,255,0.05) 1px,
+      transparent 2px,
+      transparent 3px
+    );
+    pointer-events: none;
+  }
+
+  .mode-line {
+    font-family: "Courier New", monospace;
+    color: #ffaa00;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+
+  .scenario-line {
+    font-family: "Courier New", monospace;
+    color: #33ff66;
+    text-shadow: 0 0 5px rgba(51,255,102,0.6);
+    font-size: 17px;
+    font-weight: bold;
+    letter-spacing: 0.3px;
+    text-align: center;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 4px;
+  }
+
+  .question-line {
+    font-family: "Courier New", monospace;
+    color: #9fdcb5;
+    font-size: 11px;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  /* decorative retro dial */
+  .dial-wrap { display: flex; justify-content: center; margin-bottom: 6px; }
+
+  .timer-track { margin-top: 6px; height: 8px; background: #002200; border: 1px solid #003300; }
+  .timer-fill { height: 100%; background: #33ff66; width: 100%; transition: width linear; }
+  .timer-fill.warn { background: #ffaa00; }
+  .timer-fill.danger { background: #ff3333; }
+
+  /* ---------- Answer buttons ---------- */
+  .answer-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .answer-btn {
+    flex: 1;
+    background: #c0c0c0;
+    border: 2px solid #dfdfdf;
+    border-right-color: #000;
+    border-bottom-color: #000;
+    padding: 14px 4px;
+    font-family: Tahoma, "MS Sans Serif", sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+  }
+  .answer-btn:active { border-color: #000 #dfdfdf #dfdfdf #000; }
+  .answer-btn:disabled { cursor: default; opacity: 0.6; }
+
+  .answer-btn.correct-flash {
+    background: #2e7d32;
+    color: #fff;
+    border-color: #a5d6a7 #1b5e20 #1b5e20 #a5d6a7;
+  }
+  .answer-btn.wrong-flash {
+    background: #b71c1c;
+    color: #fff;
+    border-color: #ef9a9a #7f0000 #7f0000 #ef9a9a;
+  }
+
+  /* ---------- Stat readout ---------- */
+  .stat-readout {
+    font-family: "Courier New", monospace;
+    font-size: 12px;
+    background: #000;
+    color: #33ff66;
+    border: 2px solid #808080;
+    box-shadow: inset 1px 1px 3px #000;
+    padding: 8px 10px;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  .controls { display: flex; justify-content: flex-end; }
+
+  .win98-btn {
+    background: #c0c0c0;
+    border: 2px solid #dfdfdf;
+    border-right-color: #000;
+    border-bottom-color: #000;
+    padding: 5px 16px;
+    font-family: Tahoma, "MS Sans Serif", sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .win98-btn:active { border-color: #000 #dfdfdf #dfdfdf #000; }
+
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+    display: none; align-items: center; justify-content: center;
+    padding: 16px; z-index: 10;
+  }
+  .modal-overlay.open { display: flex; }
+  .dialog { width: 100%; max-width: 320px; }
+  .dialog-body { text-align: center; padding: 18px 14px 14px; }
+  .dialog-body p { font-size: 13px; line-height: 1.6; color: #000; margin: 0 0 14px; }
+  .dialog-body .win98-btn { padding: 5px 22px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="win98-window">
+    <div class="title-bar">
+      <span>RATE_SHIFT.EXE</span>
+      <div class="title-bar-controls">
+        <button aria-hidden="true">_</button>
+        <button aria-hidden="true">&#9633;</button>
+        <button aria-hidden="true">&times;</button>
+      </div>
+    </div>
+
+    <div class="window-body">
+      <div class="eyebrow">BONUS-06 :: EXERCISE</div>
+      <h1>Rate Shift</h1>
+      <p class="blurb">
+        Two modes, one meter. In <strong>RATE</strong> rounds, call whether a change makes the reaction
+        faster or slower. In <strong>SHIFT</strong> rounds, call which way an equilibrium shifts under
+        the stress shown (Le Ch&acirc;telier's principle). Call it before the meter drains &mdash;
+        three misses and the run ends.
+      </p>
+
+      <div class="crt-screen">
+        <div class="dial-wrap">
+          <svg width="120" height="66" viewBox="0 0 120 66">
+            <path d="M10,60 A50,50 0 0 1 110,60" fill="none" stroke="#1fa34a" stroke-width="3"/>
+            <line x1="15" y1="60" x2="22" y2="52" stroke="#1fa34a" stroke-width="2"/>
+            <line x1="60" y1="10" x2="60" y2="18" stroke="#1fa34a" stroke-width="2"/>
+            <line x1="105" y1="60" x2="98" y2="52" stroke="#1fa34a" stroke-width="2"/>
+            <circle cx="60" cy="60" r="4" fill="#33ff66"/>
+            <line id="needle" x1="60" y1="60" x2="60" y2="18" stroke="#33ff66" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="mode-line" id="modeLine">MODE: REACTION RATE</div>
+        <div class="scenario-line" id="scenarioLine">ADDING A CATALYST</div>
+        <div class="question-line" id="questionLine">DOES THE REACTION SPEED UP OR SLOW DOWN?</div>
+        <div class="timer-track"><div class="timer-fill" id="timerFill"></div></div>
+      </div>
+
+      <div class="answer-row">
+        <button class="answer-btn" id="btnLeft" data-type="FASTER">FASTER</button>
+        <button class="answer-btn" id="btnRight" data-type="SLOWER">SLOWER</button>
+      </div>
+
+      <div class="stat-readout">
+        SCORE: <span id="scoreOut">0</span>&nbsp;&nbsp; STREAK: <span id="streakOut">0</span>&nbsp;&nbsp; BEST: <span id="bestOut">0</span>&nbsp;&nbsp; LIVES: <span id="livesOut">&#9679;&#9679;&#9679;</span>
+      </div>
+
+      <div class="controls">
+        <button class="win98-btn" id="restartBtn">Restart</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="win98-window dialog">
+      <div class="title-bar">
+        <span>BIOHELIX.EXE</span>
+        <div class="title-bar-controls"><button aria-hidden="true">&times;</button></div>
+      </div>
+      <div class="window-body dialog-body">
+        <p id="modalMessage">GAME OVER.<br>FINAL SCORE: 0</p>
+        <button class="win98-btn" id="modalOk">OK</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  var RATE_SCENARIOS = [
+    { text: "INCREASING THE TEMPERATURE", answer: "FASTER" },
+    { text: "DECREASING THE TEMPERATURE", answer: "SLOWER" },
+    { text: "ADDING A CATALYST", answer: "FASTER" },
+    { text: "REMOVING THE CATALYST", answer: "SLOWER" },
+    { text: "INCREASING REACTANT CONCENTRATION", answer: "FASTER" },
+    { text: "DECREASING REACTANT CONCENTRATION", answer: "SLOWER" },
+    { text: "CRUSHING A SOLID INTO POWDER (MORE SURFACE AREA)", answer: "FASTER" },
+    { text: "USING ONE LARGE CHUNK INSTEAD OF POWDER (LESS SURFACE AREA)", answer: "SLOWER" },
+    { text: "DILUTING THE SOLUTION WITH WATER", answer: "SLOWER" },
+    { text: "INCREASING THE CONCENTRATION OF GASEOUS REACTANTS", answer: "FASTER" }
+  ];
+
+  var EQ_SCENARIOS = [
+    { text: "ADDING MORE REACTANT", answer: "RIGHT" },
+    { text: "ADDING MORE PRODUCT", answer: "LEFT" },
+    { text: "REMOVING REACTANT", answer: "LEFT" },
+    { text: "REMOVING PRODUCT AS IT FORMS", answer: "RIGHT" },
+    { text: "INCREASING TEMPERATURE (REACTION IS EXOTHERMIC)", answer: "LEFT" },
+    { text: "INCREASING TEMPERATURE (REACTION IS ENDOTHERMIC)", answer: "RIGHT" },
+    { text: "DECREASING TEMPERATURE (REACTION IS EXOTHERMIC)", answer: "RIGHT" },
+    { text: "DECREASING TEMPERATURE (REACTION IS ENDOTHERMIC)", answer: "LEFT" }
+  ];
+
+  var ROUND_MS = 7000;
+
+  var modeLine = document.getElementById("modeLine");
+  var scenarioLine = document.getElementById("scenarioLine");
+  var questionLine = document.getElementById("questionLine");
+  var timerFill = document.getElementById("timerFill");
+  var needle = document.getElementById("needle");
+  var scoreOut = document.getElementById("scoreOut");
+  var streakOut = document.getElementById("streakOut");
+  var bestOut = document.getElementById("bestOut");
+  var livesOut = document.getElementById("livesOut");
+  var restartBtn = document.getElementById("restartBtn");
+  var modalOverlay = document.getElementById("modalOverlay");
+  var modalMessage = document.getElementById("modalMessage");
+  var modalOk = document.getElementById("modalOk");
+  var btnLeft = document.getElementById("btnLeft");
+  var btnRight = document.getElementById("btnRight");
+  var answerBtns = [btnLeft, btnRight];
+
+  var score, streak, best, lives, mode, correctType, timerId, timerStart, locked;
+
+  function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
+
+  function updateStats() {
+    scoreOut.textContent = score;
+    streakOut.textContent = streak;
+    bestOut.textContent = best;
+    var full = "";
+    for (var i = 0; i < 3; i++) { full += i < lives ? "\u25CF" : "\u25CB"; }
+    livesOut.textContent = full;
+  }
+
+  function resetButtons() {
+    answerBtns.forEach(function (btn) {
+      btn.classList.remove("correct-flash", "wrong-flash");
+      btn.disabled = false;
+    });
+  }
+
+  function setNeedle(angleDeg) {
+    // needle pivots at (60,60), length 42, angleDeg measured from vertical (0 = up/neutral)
+    var rad = (angleDeg - 90) * Math.PI / 180;
+    var len = 42;
+    var x = 60 + len * Math.cos(rad);
+    var y = 60 + len * Math.sin(rad);
+    needle.setAttribute("x2", x.toFixed(1));
+    needle.setAttribute("y2", y.toFixed(1));
+  }
+
+  function newRound() {
+    locked = false;
+    resetButtons();
+    setNeedle(0);
+
+    mode = Math.random() < 0.5 ? "RATE" : "EQ";
+
+    if (mode === "RATE") {
+      var r = pick(RATE_SCENARIOS);
+      correctType = r.answer;
+      modeLine.textContent = "MODE: REACTION RATE";
+      scenarioLine.textContent = r.text;
+      questionLine.textContent = "DOES THE REACTION SPEED UP OR SLOW DOWN?";
+      btnLeft.textContent = "FASTER";
+      btnLeft.dataset.type = "FASTER";
+      btnRight.textContent = "SLOWER";
+      btnRight.dataset.type = "SLOWER";
+    } else {
+      var e = pick(EQ_SCENARIOS);
+      correctType = e.answer;
+      modeLine.textContent = "MODE: EQUILIBRIUM SHIFT";
+      scenarioLine.textContent = e.text;
+      questionLine.textContent = "WHICH WAY DOES EQUILIBRIUM SHIFT?";
+      btnLeft.textContent = "\u25C4 LEFT (Reactants)";
+      btnLeft.dataset.type = "LEFT";
+      btnRight.textContent = "RIGHT (Products) \u25BA";
+      btnRight.dataset.type = "RIGHT";
+    }
+
+    startTimer();
+  }
+
+  function startTimer() {
+    clearInterval(timerId);
+    timerStart = Date.now();
+    timerFill.style.transition = "none";
+    timerFill.style.width = "100%";
+    timerFill.classList.remove("warn", "danger");
+    void timerFill.offsetWidth;
+    timerFill.style.transition = "width " + ROUND_MS + "ms linear";
+    requestAnimationFrame(function () { timerFill.style.width = "0%"; });
+
+    timerId = setInterval(function () {
+      var elapsed = Date.now() - timerStart;
+      var remaining = ROUND_MS - elapsed;
+      if (remaining < ROUND_MS * 0.3) {
+        timerFill.classList.add("danger");
+      } else if (remaining < ROUND_MS * 0.6) {
+        timerFill.classList.add("warn");
+      }
+      if (elapsed >= ROUND_MS) {
+        clearInterval(timerId);
+        handleTimeout();
+      }
+    }, 100);
+  }
+
+  function correctBtn() {
+    return answerBtns.filter(function (b) { return b.dataset.type === correctType; })[0];
+  }
+
+  function needleAngleFor(type) {
+    // left-ish answers point left (-60deg), right-ish point right (+60deg)
+    if (type === "FASTER" || type === "RIGHT") return 55;
+    return -55;
+  }
+
+  function handleTimeout() {
+    if (locked) return;
+    locked = true;
+    answerBtns.forEach(function (b) { b.disabled = true; });
+    correctBtn().classList.add("correct-flash");
+    setNeedle(needleAngleFor(correctType));
+    missPenalty();
+  }
+
+  function handleAnswer(btn) {
+    if (locked) return;
+    locked = true;
+    clearInterval(timerId);
+    answerBtns.forEach(function (b) { b.disabled = true; });
+
+    setNeedle(needleAngleFor(correctType));
+
+    if (btn.dataset.type === correctType) {
+      btn.classList.add("correct-flash");
+      score += 10;
+      streak += 1;
+      best = Math.max(best, streak);
+      updateStats();
+      setTimeout(newRound, 750);
+    } else {
+      btn.classList.add("wrong-flash");
+      correctBtn().classList.add("correct-flash");
+      missPenalty();
+    }
+  }
+
+  function missPenalty() {
+    streak = 0;
+    lives -= 1;
+    updateStats();
+    if (lives <= 0) {
+      setTimeout(gameOver, 850);
+    } else {
+      setTimeout(newRound, 950);
+    }
+  }
+
+  function gameOver() {
+    clearInterval(timerId);
+    modalMessage.innerHTML = "GAME OVER.<br>FINAL SCORE: " + score + " &mdash; BEST STREAK: " + best;
+    modalOverlay.classList.add("open");
+  }
+
+  function resetGame() {
+    score = 0;
+    streak = 0;
+    best = 0;
+    lives = 3;
+    modalOverlay.classList.remove("open");
+    updateStats();
+    newRound();
+  }
+
+  btnLeft.addEventListener("click", function () { handleAnswer(btnLeft); });
+  btnRight.addEventListener("click", function () { handleAnswer(btnRight); });
+  restartBtn.addEventListener("click", resetGame);
+  modalOk.addEventListener("click", resetGame);
+
+  resetGame();
+})();
+</script>
+</body>
+</html>
